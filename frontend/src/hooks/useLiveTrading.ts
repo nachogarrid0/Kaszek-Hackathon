@@ -19,7 +19,7 @@ export interface LiveTradingHook {
 }
 
 function nowStr(): string {
-  return new Date().toLocaleTimeString("es-AR", { hour12: false });
+  return new Date().toLocaleTimeString("en-US", { hour12: false });
 }
 
 export function useLiveTrading(strategyId: string): LiveTradingHook {
@@ -36,7 +36,7 @@ export function useLiveTrading(strategyId: string): LiveTradingHook {
   const [agentMessages, setAgentMessages] = useState<{ content: string; timestamp: string }[]>([]);
   const [tradeLog, setTradeLog] = useState<TradeLogEntry[]>([]);
   const [strategyLog, setStrategyLog] = useState<StrategyLogEntry[]>([
-    { type: "loaded", message: "Estrategia inicial cargada", timestamp: nowStr() },
+    { type: "loaded", message: "Initial strategy loaded", timestamp: nowStr() },
   ]);
   const [pendingChange, setPendingChange] = useState<PendingStrategyChange | undefined>();
 
@@ -62,7 +62,7 @@ export function useLiveTrading(strategyId: string): LiveTradingHook {
         setStatus("awaiting_approval");
         setStrategyLog((prev) => [
           ...prev,
-          { type: "obsolete", message: "Agente detectó obsolescencia → esperando aprobación", timestamp: nowStr() },
+          { type: "obsolete", message: "Agent detected obsolescence → awaiting approval", timestamp: nowStr() },
         ]);
       }
     }).then(({ stop }) => {
@@ -85,8 +85,8 @@ export function useLiveTrading(strategyId: string): LiveTradingHook {
         setStrategyLog((prev) => [
           ...prev,
           approved
-            ? { type: "approved", message: "Usuario aprobó → nueva estrategia activa", timestamp: nowStr() }
-            : { type: "rejected", message: "Usuario rechazó → se mantiene estrategia anterior", timestamp: nowStr() },
+            ? { type: "approved", message: "User approved → new strategy active", timestamp: nowStr() }
+            : { type: "rejected", message: "User rejected → previous strategy maintained", timestamp: nowStr() },
         ]);
       } catch (err) {
         console.error("Failed to approve live trading", err);
