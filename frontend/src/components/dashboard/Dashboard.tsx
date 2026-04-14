@@ -29,7 +29,7 @@ export function Dashboard() {
           <BarChart3 className="w-8 h-8 text-zinc-300" />
         </div>
         <p className="text-sm text-zinc-400">
-          El dashboard se va a construir automaticamente mientras el agente trabaja
+          The dashboard will build automatically as the agent works
         </p>
       </div>
     );

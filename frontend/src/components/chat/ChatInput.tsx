@@ -47,7 +47,7 @@ export function ChatInput({ onSend, disabled, placeholder }: ChatInputProps) {
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
           onInput={handleInput}
-          placeholder={placeholder || "Escribi tu tesis de inversion..."}
+          placeholder={placeholder || "Write your investment thesis..."}
           disabled={disabled}
           rows={1}
           className="flex-1 resize-none rounded-lg border border-zinc-300 px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"

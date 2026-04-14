@@ -15,13 +15,13 @@ export function Header() {
           href="/app"
           className="text-sm text-zinc-600 hover:text-zinc-900 transition-colors"
         >
-          Nueva Estrategia
+          New Strategy
         </Link>
         <Link
           href="/strategies"
           className="text-sm text-zinc-600 hover:text-zinc-900 transition-colors"
         >
-          Mis Estrategias
+          My Strategies
         </Link>
         <Link
           href="/live/demo?scenario=rotation"

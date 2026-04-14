@@ -26,14 +26,14 @@ export function ApproveButton({ strategyId }: ApproveButtonProps) {
       <div className="space-y-2 animate-in fade-in duration-300">
         <div className="flex items-center gap-2 px-6 py-3 rounded-xl bg-green-50 border border-green-200 text-green-700">
           <Check className="w-5 h-5" />
-          <span className="font-medium">Estrategia aprobada y guardada</span>
+          <span className="font-medium">Strategy approved and saved</span>
         </div>
         <a
           href={`/live/${strategyId}?scenario=bull`}
           className="w-full py-3 rounded-xl bg-zinc-900 text-white font-medium hover:bg-zinc-700 transition-colors flex items-center justify-center gap-2"
         >
           <span className="w-2 h-2 rounded-full bg-green-400 inline-block" />
-          Abrir Live Trading
+          Open Live Trading
         </a>
       </div>
     );
@@ -50,7 +50,7 @@ export function ApproveButton({ strategyId }: ApproveButtonProps) {
       ) : (
         <Check className="w-4 h-4" />
       )}
-      Aprobar y guardar estrategia
+      Approve and save strategy
     </button>
   );
 }

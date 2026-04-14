@@ -16,18 +16,18 @@ export function PositionsTable({ portfolio }: PositionsTableProps) {
   return (
     <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden">
       <div className="px-4 py-3 border-b border-zinc-100">
-        <h3 className="text-xs font-medium text-zinc-500">Posiciones Abiertas</h3>
+        <h3 className="text-xs font-medium text-zinc-500">Open Positions</h3>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-zinc-100 bg-zinc-50">
-              <th className="text-left px-4 py-2 text-xs font-medium text-zinc-400">Activo</th>
-              <th className="text-right px-4 py-2 text-xs font-medium text-zinc-400">Entrada</th>
-              <th className="text-right px-4 py-2 text-xs font-medium text-zinc-400">Actual</th>
+              <th className="text-left px-4 py-2 text-xs font-medium text-zinc-400">Asset</th>
+              <th className="text-right px-4 py-2 text-xs font-medium text-zinc-400">Entry</th>
+              <th className="text-right px-4 py-2 text-xs font-medium text-zinc-400">Current</th>
               <th className="text-right px-4 py-2 text-xs font-medium text-zinc-400">PnL $</th>
               <th className="text-right px-4 py-2 text-xs font-medium text-zinc-400">PnL %</th>
-              <th className="text-center px-4 py-2 text-xs font-medium text-zinc-400">Estado</th>
+              <th className="text-center px-4 py-2 text-xs font-medium text-zinc-400">Status</th>
             </tr>
           </thead>
           <tbody>

@@ -29,7 +29,7 @@ export function StrategyCard({ strategy }: StrategyCardProps) {
       {strategy.metrics && (
         <div className="grid grid-cols-3 gap-3 mt-4">
           <div>
-            <p className="text-xs text-zinc-400">Retorno</p>
+            <p className="text-xs text-zinc-400">Return</p>
             <p className={`text-sm font-semibold ${isPositive ? "text-green-600" : "text-red-600"}`}>
               {isPositive ? "+" : ""}{strategy.metrics.total_return}%
             </p>

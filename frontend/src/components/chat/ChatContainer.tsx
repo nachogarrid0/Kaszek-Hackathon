@@ -32,14 +32,14 @@ export function ChatContainer() {
               TradeMind AI
             </h2>
             <p className="text-sm text-zinc-500 max-w-sm leading-relaxed">
-              Escribi tu tesis de inversion en lenguaje natural y voy a
-              convertirla en una estrategia cuantificada y backtestada.
+              Write your investment thesis in natural language and I will
+              convert it into a quantified, backtested strategy.
             </p>
             <div className="mt-6 space-y-2 w-full max-w-sm">
               {[
-                "Creo que la IA va a dominar el mercado los proximos 2 anos",
-                "Quiero invertir en energia renovable, tengo $5000",
-                "Creo que las big tech estan baratas despues de la correccion",
+                "I think AI will dominate the market over the next 2 years",
+                "I want to invest in renewable energy, I have $5000",
+                "I think big tech is cheap after the recent correction",
               ].map((example) => (
                 <button
                   key={example}

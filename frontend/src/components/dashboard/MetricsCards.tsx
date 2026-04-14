@@ -17,7 +17,7 @@ interface MetricsCardsProps {
 export function MetricsCards({ metrics }: MetricsCardsProps) {
   const cards = [
     {
-      label: "Retorno Total",
+      label: "Total Return",
       value: `${metrics.total_return > 0 ? "+" : ""}${metrics.total_return}%`,
       icon: metrics.total_return >= 0 ? TrendingUp : TrendingDown,
       color: metrics.total_return >= 0 ? "text-green-600" : "text-red-600",
@@ -38,7 +38,7 @@ export function MetricsCards({ metrics }: MetricsCardsProps) {
       bg: metrics.max_drawdown > -20 ? "bg-green-50" : "bg-red-50",
     },
     {
-      label: "Volatilidad",
+      label: "Volatility",
       value: `${metrics.volatility}%`,
       icon: Activity,
       color: "text-blue-600",
@@ -52,7 +52,7 @@ export function MetricsCards({ metrics }: MetricsCardsProps) {
       bg: metrics.win_rate >= 50 ? "bg-green-50" : "bg-amber-50",
     },
     {
-      label: "Valor Final",
+      label: "Final Value",
       value: `$${metrics.final_value.toLocaleString()}`,
       icon: TrendingUp,
       color: "text-zinc-700",

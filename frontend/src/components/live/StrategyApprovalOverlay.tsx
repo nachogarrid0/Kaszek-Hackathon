@@ -17,8 +17,8 @@ export function StrategyApprovalOverlay({ pending, onApprove }: StrategyApproval
             <AlertTriangle className="w-5 h-5 text-amber-600" />
           </div>
           <div>
-            <h3 className="font-semibold text-zinc-900">Trading pausado</h3>
-            <p className="text-xs text-zinc-500">El agente detectó que la estrategia actual quedó obsoleta</p>
+            <h3 className="font-semibold text-zinc-900">Trading paused</h3>
+            <p className="text-xs text-zinc-500">The agent detected the current strategy is obsolete</p>
           </div>
         </div>
 
@@ -41,14 +41,14 @@ export function StrategyApprovalOverlay({ pending, onApprove }: StrategyApproval
             className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-zinc-200 text-zinc-600 text-sm font-medium hover:bg-zinc-50 transition-colors"
           >
             <X className="w-4 h-4" />
-            Rechazar — mantener actual
+            Reject — keep current
           </button>
           <button
             onClick={() => onApprove(true)}
             className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors"
           >
             <Check className="w-4 h-4" />
-            Aprobar nueva estrategia
+            Approve new strategy
           </button>
         </div>
       </div>

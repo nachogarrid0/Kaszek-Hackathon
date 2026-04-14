@@ -9,7 +9,7 @@ import type { StrategyParams } from "@/types";
 export type Scenario = "bull" | "rotation" | "defensive";
 
 function ts(): string {
-  return new Date().toLocaleTimeString("es-AR", { hour12: false });
+  return new Date().toLocaleTimeString("en-US", { hour12: false });
 }
 
 function delta(pos: Position, priceDelta: number): Position {
@@ -47,13 +47,13 @@ const BULL_POSITIONS_INIT: Position[] = [
 ];
 
 const BULL_AGENT_MESSAGES = [
-  "Analizando momentum en el sector tech. NVDA muestra señales alcistas — incrementando exposición.",
-  "AAPL consolidando sobre soporte clave en $190. Manteniendo posición.",
-  "El mercado está reaccionando positivamente a los datos de empleo. Tech liderando el alza.",
-  "META aceleró volumen en las últimas horas. La tendencia se mantiene sólida.",
-  "Revisando correlaciones entre MSFT y GOOGL. Diversificación saludable.",
-  "PnL total supera el 3% diario. Estrategia funcionando dentro de parámetros esperados.",
-  "Monitoreando resistencia en NVDA $930. Si rompe, podría extenderse a $950.",
+  "Analyzing momentum in the tech sector. NVDA showing bullish signals — increasing exposure.",
+  "AAPL consolidating above key support at $190. Holding position.",
+  "Market reacting positively to employment data. Tech leading the rally.",
+  "META accelerated volume in the last few hours. Trend remains solid.",
+  "Reviewing correlations between MSFT and GOOGL. Healthy diversification.",
+  "Total PnL exceeds 3% daily. Strategy operating within expected parameters.",
+  "Monitoring resistance at NVDA $930. A breakout could extend to $950.",
 ];
 
 const BULL_TRADES: Array<{ action: "BUY" | "SELL" | "HOLD"; symbol: string; qty: number; price: number }> = [
@@ -94,26 +94,26 @@ const ROTATION_NEW_STRATEGY: StrategyParams = {
 };
 
 const ROTATION_PENDING: PendingStrategyChange = {
-  reason: "TSLA y MSFT perdieron momentum. El sector defensivo y commodities muestran fortaleza relativa.",
+  reason: "TSLA and MSFT lost momentum. Defensive sector and commodities show relative strength.",
   old_strategy: ROTATION_OLD_STRATEGY,
   new_strategy: ROTATION_NEW_STRATEGY,
   changes: [
-    "+ NVDA (25%) — líder en IA, momentum alcista",
-    "+ GLD (15%) — cobertura ante incertidumbre macro",
-    "+ BRK.B (15%) — defensivo y estable",
-    "- TSLA — stop-loss activado, salida total",
-    "- MSFT — reducción por rotación sectorial",
+    "+ NVDA (25%) — AI leader, bullish momentum",
+    "+ GLD (15%) — hedge against macro uncertainty",
+    "+ BRK.B (15%) — defensive and stable",
+    "- TSLA — stop-loss triggered, full exit",
+    "- MSFT — reduced due to sector rotation",
     "Stop-loss: 3% → 5%",
   ],
 };
 
 const ROTATION_AGENT_MESSAGES = [
-  "Cargando estrategia mid-term. Revisando posiciones actuales.",
-  "TSLA muestra debilidad estructural. El volumen de ventas superó al de compras en 3 sesiones consecutivas.",
-  "MSFT por debajo de su media móvil de 50 días. Señal de alerta.",
-  "El sector tech está perdiendo liderazgo frente a commodities y energía.",
-  "Analizando correlación con el índice VIX. Volatilidad en aumento.",
-  "⚠ Detecto que la estrategia actual perdió validez. Preparando propuesta de rotación sectorial.",
+  "Loading mid-term strategy. Reviewing current positions.",
+  "TSLA showing structural weakness. Sell volume exceeded buy volume in 3 consecutive sessions.",
+  "MSFT below its 50-day moving average. Warning signal.",
+  "Tech sector losing leadership to commodities and energy.",
+  "Analyzing correlation with VIX index. Volatility increasing.",
+  "⚠ Current strategy has lost validity. Preparing sector rotation proposal.",
 ];
 
 const DEFENSIVE_POSITIONS_INIT: Position[] = [
@@ -125,12 +125,12 @@ const DEFENSIVE_POSITIONS_INIT: Position[] = [
 ];
 
 const DEFENSIVE_AGENT_MESSAGES = [
-  "Estrategia defensiva de largo plazo activa. Foco en preservación de capital.",
-  "GLD mostrando apreciación sostenida. El contexto macro favorece el oro.",
-  "JNJ y PG como anclas defensivas. Baja correlación con el mercado general.",
-  "BRK.B diversifica exposición sin aumentar volatilidad del portfolio.",
-  "El ratio de Sharpe del portfolio se mantiene por encima de 1.2. Muy saludable.",
-  "Revisando la estrategia frente al cambio en tasas de interés. Ajuste menor requerido.",
+  "Long-term defensive strategy active. Focus on capital preservation.",
+  "GLD showing sustained appreciation. Macro context favors gold.",
+  "JNJ and PG as defensive anchors. Low correlation with the broad market.",
+  "BRK.B diversifies exposure without increasing portfolio volatility.",
+  "Portfolio Sharpe ratio remains above 1.2. Very healthy.",
+  "Reviewing strategy against interest rate changes. Minor adjustment required.",
 ];
 
 export interface MockSession {

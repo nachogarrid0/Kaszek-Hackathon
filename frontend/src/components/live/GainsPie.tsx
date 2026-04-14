@@ -22,7 +22,7 @@ export function GainsPie({ portfolio }: GainsPieProps) {
 
   return (
     <div className="bg-white rounded-xl border border-zinc-200 p-4 flex-1">
-      <h3 className="text-xs font-medium text-zinc-500 mb-3">Ganancia por Activo</h3>
+      <h3 className="text-xs font-medium text-zinc-500 mb-3">Gain per Asset</h3>
       <div className="flex items-center gap-4">
         <div className="w-28 h-28 shrink-0">
           <ResponsiveContainer width="100%" height="100%">

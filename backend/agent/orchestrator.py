@@ -24,7 +24,7 @@ async def run_agent(thesis: str) -> AsyncGenerator[str, None]:
     messages = [{"role": "user", "content": thesis}]
 
     yield _sse("session_start", {"strategy_id": strategy_id})
-    yield _sse("thinking", {"step": "Analizando tu tesis de inversión..."})
+    yield _sse("thinking", {"step": "Analyzing your investment thesis..."})
 
     max_iterations = 20
     for _ in range(max_iterations):
@@ -82,13 +82,13 @@ def _sse(event: str, data: dict) -> str:
 
 def _tool_thinking_message(tool_name: str) -> str:
     messages = {
-        "identify_assets": "Identificando los activos más relevantes para tu tesis...",
-        "get_historical_data": "Descargando datos históricos de mercado...",
-        "run_backtest": "Ejecutando backtest de la estrategia...",
-        "compare_with_benchmark": "Comparando contra el S&P 500...",
-        "update_dashboard": "Actualizando el dashboard...",
+        "identify_assets": "Identifying the most relevant assets for your thesis...",
+        "get_historical_data": "Downloading historical market data...",
+        "run_backtest": "Running strategy backtest...",
+        "compare_with_benchmark": "Comparing against S&P 500...",
+        "update_dashboard": "Updating dashboard...",
     }
-    return messages.get(tool_name, "Procesando...")
+    return messages.get(tool_name, "Processing...")
 
 
 def _tool_to_dashboard_event(tool_name: str, result: dict) -> dict | None:

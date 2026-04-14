@@ -18,7 +18,7 @@ export function AssetAllocation({ assets }: AssetAllocationProps) {
   return (
     <div className="bg-white rounded-xl border border-zinc-200 p-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <h3 className="text-sm font-medium text-zinc-500 mb-4">
-        Asignacion de Activos
+        Asset Allocation
       </h3>
       <div className="flex items-center gap-6">
         <div className="w-32 h-32">
