@@ -6,6 +6,23 @@ export interface ChatMessage {
   timestamp: number;
 }
 
+// --- Clarification ---
+export interface ClarificationQuestion {
+  id: string;
+  question: string;
+  type: "select" | "number" | "text";
+  options?: string[];
+  placeholder?: string;
+  required: boolean;
+}
+
+export interface ClarificationResponse {
+  session_id: string;
+  thesis: string;
+  intro_message: string;
+  questions: ClarificationQuestion[];
+}
+
 // --- Macro Context ---
 export interface MacroIndicator {
   current: number;
@@ -148,3 +165,5 @@ export type DashboardUpdateType =
   | "technical_signals"
   | "backtest_result"
   | "final_strategy";
+
+export type AppPhase = "idle" | "clarifying" | "answering" | "analyzing";

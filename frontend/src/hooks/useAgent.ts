@@ -2,7 +2,7 @@
 
 import { useCallback } from "react";
 import { useAppStore } from "@/stores/appStore";
-import { runAgent } from "@/services/api";
+import { clarifyThesis, submitClarificationAnswers, runAgentWithContext, runAgent } from "@/services/api";
 import type {
   MacroContext,
   AssetSelected,
@@ -19,8 +19,11 @@ export function useAgent() {
       if (store.isStreaming) return;
 
       store.resetDashboard();
+      store.clearClarification();
       store.setStreaming(true);
+      store.setPhase("clarifying");
 
+      // Add user message to chat
       store.addMessage({
         id: crypto.randomUUID(),
         role: "user",
@@ -29,108 +32,64 @@ export function useAgent() {
       });
 
       try {
-        await runAgent(thesis, (event, data) => {
-          switch (event) {
-            // ── Session lifecycle ──
-            case "session_start":
-              store.setStrategyId(data.strategy_id as string);
-              break;
+        // Phase 0: Get clarification questions from Claude
+        const clarification = await clarifyThesis(thesis);
 
-            case "status":
-              store.setThinkingStep(data.message as string);
-              break;
+        store.setClarificationSession(
+          clarification.session_id,
+          clarification.intro_message,
+          clarification.questions,
+        );
 
-            // ── Streaming text (token by token) ──
-            case "text_delta": {
-              if (!store.streamingMessageId) {
-                store.startStreamingMessage();
-              }
-              store.setThinkingStep(null);
-              store.setToolProgress(null);
-              store.appendToStreamingMessage(data.content as string);
-              break;
-            }
+        // Add the intro message as assistant message
+        store.addMessage({
+          id: crypto.randomUUID(),
+          role: "assistant",
+          content: clarification.intro_message,
+          timestamp: Date.now(),
+        });
 
-            // ── Complete chat message (fallback for non-streamed) ──
-            case "chat_message": {
-              store.finishStreamingMessage();
-              store.addMessage({
-                id: crypto.randomUUID(),
-                role: "assistant",
-                content: data.content as string,
-                timestamp: Date.now(),
-              });
-              store.setThinkingStep(null);
-              store.setToolProgress(null);
-              break;
-            }
+        store.setStreaming(false);
+      } catch (error) {
+        console.warn("Clarification failed, falling back to direct run:", error);
+        // If clarification fails, fall back to direct agent run
+        store.setPhase("analyzing");
+        await _runAgent(thesis);
+      }
+    },
+    [store],
+  );
 
-            // ── Tool lifecycle: start → executing → result ──
-            case "tool_start":
-              store.finishStreamingMessage();
-              store.setToolProgress({
-                tool: data.tool as string,
-                status: "running",
-                message: data.message as string,
-              });
-              store.setThinkingStep(data.message as string);
-              break;
+  const submitAnswersAndRun = useCallback(
+    async (answers: Record<string, string>) => {
+      const sessionId = store.clarificationSessionId;
+      if (!sessionId || store.isStreaming) return;
 
-            case "tool_executing":
-              store.setToolProgress({
-                tool: data.tool as string,
-                status: "running",
-                message: store.currentThinkingStep || "Ejecutando...",
-                inputPreview: data.input_preview as string,
-              });
-              break;
+      store.setStreaming(true);
+      store.setPhase("analyzing");
 
-            case "tool_result":
-              store.setToolProgress({
-                tool: data.tool as string,
-                status: data.ok ? "done" : "error",
-                message: data.ok ? "Completado" : "Error",
-                resultPreview: data.preview as string,
-              });
-              // Clear after a short visual delay
-              setTimeout(() => {
-                store.setToolProgress(null);
-                store.setThinkingStep(null);
-              }, 800);
-              break;
+      // Add a summary of the answers as a user message
+      const questionMap: Record<string, string> = {};
+      for (const q of store.clarificationQuestions) {
+        questionMap[q.id] = q.question;
+      }
+      const answerLines = Object.entries(answers)
+        .map(([key, value]) => `• ${questionMap[key] || key}: ${value}`)
+        .join("\n");
 
-            // ── Dashboard updates ──
-            case "dashboard_update":
-              handleDashboardUpdate(data as { type: string; data: Record<string, unknown> });
-              break;
+      store.addMessage({
+        id: crypto.randomUUID(),
+        role: "user",
+        content: answerLines,
+        timestamp: Date.now(),
+      });
 
-            // ── Usage stats ──
-            case "usage":
-              // Could display token usage if desired
-              break;
-
-            // ── Error ──
-            case "error":
-              store.finishStreamingMessage();
-              store.addMessage({
-                id: crypto.randomUUID(),
-                role: "assistant",
-                content: `Error: ${data.message as string}`,
-                timestamp: Date.now(),
-              });
-              break;
-
-            // ── Done ──
-            case "done":
-              store.finishStreamingMessage();
-              store.setComplete(true);
-              store.setThinkingStep(null);
-              store.setToolProgress(null);
-              break;
-          }
+      try {
+        await submitClarificationAnswers(sessionId, answers);
+        await runAgentWithContext(sessionId, (event, data) => {
+          _handleAgentEvent(event, data);
         });
       } catch (error) {
-        store.finishStreamingMessage();
         store.addMessage({
           id: crypto.randomUUID(),
           role: "assistant",
@@ -139,12 +98,116 @@ export function useAgent() {
         });
       } finally {
         store.setStreaming(false);
-        store.setThinkingStep(null);
-        store.setToolProgress(null);
+        store.clearProgress();
       }
     },
     [store],
   );
+
+  async function _runAgent(thesis: string) {
+    try {
+      await runAgent(thesis, (event, data) => {
+        _handleAgentEvent(event, data);
+      });
+    } catch (error) {
+      store.addMessage({
+        id: crypto.randomUUID(),
+        role: "assistant",
+        content: `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
+        timestamp: Date.now(),
+      });
+    } finally {
+      store.setStreaming(false);
+      store.clearProgress();
+    }
+  }
+
+  function _handleAgentEvent(event: string, data: Record<string, unknown>) {
+    switch (event) {
+      case "session_start":
+        store.setStrategyId(data.strategy_id as string);
+        break;
+
+      case "status":
+        store.setCurrentStatusText(data.message as string);
+        break;
+
+      // Text deltas — ignore for chat (prevents fragmentation)
+      case "text_delta":
+        break;
+
+      // Complete text block — store it (overwrite, so we always keep the LAST one)
+      case "chat_message":
+        store.clearAgentText();
+        store.appendAgentText(data.content as string);
+        store.setCurrentStatusText(null);
+        break;
+
+      // Tool lifecycle — show as animated progress
+      case "tool_start":
+        store.setToolProgress({
+          tool: data.tool as string,
+          status: "running",
+          message: data.message as string,
+        });
+        store.setCurrentStatusText(data.message as string);
+        break;
+
+      case "tool_executing":
+        store.setToolProgress({
+          tool: data.tool as string,
+          status: "running",
+          message: store.currentStatusText || "Ejecutando...",
+          inputPreview: data.input_preview as string,
+        });
+        break;
+
+      case "tool_result":
+        store.addCompletedStep({
+          id: crypto.randomUUID(),
+          tool: data.tool as string,
+          message: store.currentStatusText || "Completado",
+          resultPreview: data.preview as string,
+          ok: data.ok as boolean,
+        });
+        store.setToolProgress(null);
+        store.setCurrentStatusText(null);
+        // Clear accumulated text after each tool result (it was reasoning)
+        store.clearAgentText();
+        break;
+
+      case "dashboard_update":
+        handleDashboardUpdate(data as { type: string; data: Record<string, unknown> });
+        break;
+
+      case "usage":
+        break;
+
+      case "error":
+        store.addMessage({
+          id: crypto.randomUUID(),
+          role: "assistant",
+          content: `Error: ${data.message as string}`,
+          timestamp: Date.now(),
+        });
+        break;
+
+      case "done":
+        // Add the final accumulated text as ONE clean chat message
+        const finalText = store.agentAccumulatedText.trim();
+        if (finalText) {
+          store.addMessage({
+            id: crypto.randomUUID(),
+            role: "assistant",
+            content: finalText,
+            timestamp: Date.now(),
+          });
+        }
+        store.setComplete(true);
+        store.clearProgress();
+        break;
+    }
+  }
 
   function handleDashboardUpdate(update: { type: string; data: Record<string, unknown> }) {
     switch (update.type) {
@@ -174,5 +237,10 @@ export function useAgent() {
     }
   }
 
-  return { sendThesis, isStreaming: store.isStreaming };
+  return {
+    sendThesis,
+    submitAnswersAndRun,
+    isStreaming: store.isStreaming,
+    phase: store.phase,
+  };
 }

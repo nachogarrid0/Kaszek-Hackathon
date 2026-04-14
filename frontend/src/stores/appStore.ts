@@ -7,6 +7,8 @@ import type {
   TechnicalSignal,
   BacktestResult,
   Strategy,
+  ClarificationQuestion,
+  AppPhase,
 } from "@/types";
 
 export interface ToolProgress {
@@ -17,13 +19,33 @@ export interface ToolProgress {
   resultPreview?: string;
 }
 
+export interface CompletedStep {
+  id: string;
+  tool: string;
+  message: string;
+  resultPreview?: string;
+  ok: boolean;
+}
+
 interface AppState {
-  // Chat
+  // Phase
+  phase: AppPhase;
+
+  // Clarification
+  clarificationSessionId: string | null;
+  clarificationIntro: string | null;
+  clarificationQuestions: ClarificationQuestion[];
+  clarificationAnswers: Record<string, string>;
+
+  // Chat (only user messages + final agent response)
   messages: ChatMessage[];
   isStreaming: boolean;
-  currentThinkingStep: string | null;
-  streamingMessageId: string | null;
+
+  // Agent progress (separate from chat — shown as animated status)
+  currentStatusText: string | null;
   toolProgress: ToolProgress | null;
+  completedSteps: CompletedStep[];
+  agentAccumulatedText: string;
 
   // Dashboard — progressive
   strategyId: string | null;
@@ -38,14 +60,25 @@ interface AppState {
   // Strategies
   savedStrategies: Strategy[];
 
+  // Actions — phase
+  setPhase: (phase: AppPhase) => void;
+
+  // Actions — clarification
+  setClarificationSession: (sessionId: string, intro: string, questions: ClarificationQuestion[]) => void;
+  setClarificationAnswer: (questionId: string, answer: string) => void;
+  clearClarification: () => void;
+
   // Actions — chat
   addMessage: (msg: ChatMessage) => void;
-  startStreamingMessage: () => string;
-  appendToStreamingMessage: (text: string) => void;
-  finishStreamingMessage: () => void;
   setStreaming: (streaming: boolean) => void;
-  setThinkingStep: (step: string | null) => void;
+
+  // Actions — agent progress
+  setCurrentStatusText: (text: string | null) => void;
   setToolProgress: (tp: ToolProgress | null) => void;
+  addCompletedStep: (step: CompletedStep) => void;
+  appendAgentText: (text: string) => void;
+  clearAgentText: () => void;
+  clearProgress: () => void;
 
   // Actions — dashboard
   setStrategyId: (id: string) => void;
@@ -62,13 +95,19 @@ interface AppState {
   setSavedStrategies: (strategies: Strategy[]) => void;
 }
 
-export const useAppStore = create<AppState>((set, get) => ({
+export const useAppStore = create<AppState>((set) => ({
   // Initial state
+  phase: "idle",
+  clarificationSessionId: null,
+  clarificationIntro: null,
+  clarificationQuestions: [],
+  clarificationAnswers: {},
   messages: [],
   isStreaming: false,
-  currentThinkingStep: null,
-  streamingMessageId: null,
+  currentStatusText: null,
   toolProgress: null,
+  completedSteps: [],
+  agentAccumulatedText: "",
   strategyId: null,
   macroContext: null,
   selectedAssets: [],
@@ -80,51 +119,50 @@ export const useAppStore = create<AppState>((set, get) => ({
   savedStrategies: [],
 
   // Actions
+  setPhase: (phase) => set({ phase }),
+
+  setClarificationSession: (sessionId, intro, questions) =>
+    set({
+      clarificationSessionId: sessionId,
+      clarificationIntro: intro,
+      clarificationQuestions: questions,
+      clarificationAnswers: {},
+      phase: "answering",
+    }),
+
+  setClarificationAnswer: (questionId, answer) =>
+    set((state) => ({
+      clarificationAnswers: { ...state.clarificationAnswers, [questionId]: answer },
+    })),
+
+  clearClarification: () =>
+    set({
+      clarificationSessionId: null,
+      clarificationIntro: null,
+      clarificationQuestions: [],
+      clarificationAnswers: {},
+    }),
+
   addMessage: (msg) =>
     set((state) => ({ messages: [...state.messages, msg] })),
 
-  startStreamingMessage: () => {
-    const id = crypto.randomUUID();
-    const msg: ChatMessage = {
-      id,
-      role: "assistant",
-      content: "",
-      timestamp: Date.now(),
-    };
-    set((state) => ({
-      messages: [...state.messages, msg],
-      streamingMessageId: id,
-    }));
-    return id;
-  },
-
-  appendToStreamingMessage: (text: string) => {
-    const { streamingMessageId } = get();
-    if (!streamingMessageId) return;
-    set((state) => ({
-      messages: state.messages.map((m) =>
-        m.id === streamingMessageId
-          ? { ...m, content: m.content + text }
-          : m,
-      ),
-    }));
-  },
-
-  finishStreamingMessage: () => {
-    const { streamingMessageId } = get();
-    if (!streamingMessageId) return;
-    // Remove empty streaming messages
-    set((state) => ({
-      messages: state.messages.filter(
-        (m) => m.id !== streamingMessageId || m.content.trim().length > 0,
-      ),
-      streamingMessageId: null,
-    }));
-  },
-
   setStreaming: (streaming) => set({ isStreaming: streaming }),
-  setThinkingStep: (step) => set({ currentThinkingStep: step }),
+
+  setCurrentStatusText: (text) => set({ currentStatusText: text }),
   setToolProgress: (tp) => set({ toolProgress: tp }),
+  addCompletedStep: (step) =>
+    set((state) => ({ completedSteps: [...state.completedSteps, step] })),
+  appendAgentText: (text) =>
+    set((state) => ({ agentAccumulatedText: state.agentAccumulatedText + text })),
+  clearAgentText: () => set({ agentAccumulatedText: "" }),
+  clearProgress: () =>
+    set({
+      currentStatusText: null,
+      toolProgress: null,
+      completedSteps: [],
+      agentAccumulatedText: "",
+    }),
+
   setStrategyId: (id) => set({ strategyId: id }),
   setMacroContext: (ctx) => set({ macroContext: ctx }),
   setSelectedAssets: (assets) => set({ selectedAssets: assets }),
@@ -145,8 +183,9 @@ export const useAppStore = create<AppState>((set, get) => ({
       backtestResult: null,
       finalStrategy: null,
       isComplete: false,
-      currentThinkingStep: null,
+      currentStatusText: null,
       toolProgress: null,
-      streamingMessageId: null,
+      completedSteps: [],
+      agentAccumulatedText: "",
     }),
 }));

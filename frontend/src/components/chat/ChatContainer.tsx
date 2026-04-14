@@ -5,68 +5,106 @@ import { useAppStore } from "@/stores/appStore";
 import { useAgent } from "@/hooks/useAgent";
 import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
-import { ThinkingStep } from "./ThinkingStep";
-import { TrendingUp } from "lucide-react";
+import { AgentProgress } from "./AgentProgress";
+import { ClarificationForm } from "./ClarificationForm";
+import { TrendingUp, Sparkles } from "lucide-react";
 
 export function ChatContainer() {
-  const { messages, isStreaming, currentThinkingStep } = useAppStore();
-  const { sendThesis } = useAgent();
+  const {
+    messages,
+    isStreaming,
+    phase,
+    clarificationQuestions,
+  } = useAppStore();
+  const { sendThesis, submitAnswersAndRun } = useAgent();
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, currentThinkingStep]);
+  }, [messages, phase, isStreaming]);
 
   const isEmpty = messages.length === 0;
+  const showClarificationForm =
+    phase === "answering" && clarificationQuestions.length > 0;
+  const showInput = phase === "idle" || phase === "analyzing";
 
   return (
     <div className="flex flex-col h-full">
       {/* Messages area */}
-      <div className="flex-1 overflow-y-auto px-4 py-6">
+      <div className="flex-1 overflow-y-auto px-4 py-6 custom-scrollbar">
         {isEmpty ? (
-          <div className="flex flex-col items-center justify-center h-full text-center px-8">
-            <div className="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center mb-6">
-              <TrendingUp className="w-8 h-8 text-blue-600" />
-            </div>
-            <h2 className="text-xl font-semibold text-zinc-900 mb-2">
-              TradeMind AI
-            </h2>
-            <p className="text-sm text-zinc-500 max-w-sm leading-relaxed">
-              Escribi tu tesis de inversion en lenguaje natural y voy a
-              convertirla en una estrategia cuantificada y backtestada.
-            </p>
-            <div className="mt-6 space-y-2 w-full max-w-sm">
-              {[
-                "Creo que la IA va a dominar el mercado los proximos 2 anos",
-                "Quiero invertir en energia renovable, tengo $5000",
-                "Creo que las big tech estan baratas despues de la correccion",
-              ].map((example) => (
-                <button
-                  key={example}
-                  onClick={() => sendThesis(example)}
-                  disabled={isStreaming}
-                  className="w-full text-left text-xs text-zinc-500 bg-zinc-50 hover:bg-zinc-100 rounded-lg px-4 py-3 transition-colors disabled:opacity-50"
-                >
-                  &ldquo;{example}&rdquo;
-                </button>
-              ))}
-            </div>
-          </div>
+          <EmptyState onSelect={sendThesis} disabled={isStreaming} />
         ) : (
           <div className="space-y-4">
+            {/* Chat messages — only user + final agent responses */}
             {messages.map((msg) => (
               <ChatMessage key={msg.id} message={msg} />
             ))}
-            {currentThinkingStep && (
-              <ThinkingStep step={currentThinkingStep} />
+
+            {/* Clarification form — interactive questions from Claude */}
+            {showClarificationForm && (
+              <ClarificationForm
+                onSubmit={submitAnswersAndRun}
+                disabled={isStreaming}
+              />
             )}
+
+            {/* Agent progress — animated status (separate from chat) */}
+            <AgentProgress />
+
             <div ref={bottomRef} />
           </div>
         )}
       </div>
 
-      {/* Input */}
-      <ChatInput onSend={sendThesis} disabled={isStreaming} />
+      {/* Input — hide during clarification */}
+      {showInput && (
+        <ChatInput onSend={sendThesis} disabled={isStreaming} />
+      )}
+    </div>
+  );
+}
+
+function EmptyState({
+  onSelect,
+  disabled,
+}: {
+  onSelect: (thesis: string) => void;
+  disabled: boolean;
+}) {
+  const examples = [
+    "Creo que la IA va a dominar el mercado los proximos 2 anos",
+    "Quiero invertir en energia renovable, tengo $5000",
+    "Creo que las big tech estan baratas despues de la correccion",
+  ];
+
+  return (
+    <div className="flex flex-col items-center justify-center h-full text-center px-8">
+      <div className="relative mb-6">
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600/20 to-violet-600/20 flex items-center justify-center backdrop-blur-sm border border-white/10">
+          <TrendingUp className="w-8 h-8 text-blue-400" />
+        </div>
+        <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-gradient-to-r from-violet-500 to-blue-500 flex items-center justify-center">
+          <Sparkles className="w-3 h-3 text-white" />
+        </div>
+      </div>
+      <h2 className="text-xl font-semibold text-white mb-2">TradeMind AI</h2>
+      <p className="text-sm text-zinc-400 max-w-sm leading-relaxed">
+        Escribí tu tesis de inversión en lenguaje natural y voy a convertirla en
+        una estrategia cuantificada y backtestada.
+      </p>
+      <div className="mt-6 space-y-2 w-full max-w-sm">
+        {examples.map((example) => (
+          <button
+            key={example}
+            onClick={() => onSelect(example)}
+            disabled={disabled}
+            className="w-full text-left text-xs text-zinc-400 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/15 rounded-xl px-4 py-3 transition-all disabled:opacity-50"
+          >
+            &ldquo;{example}&rdquo;
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

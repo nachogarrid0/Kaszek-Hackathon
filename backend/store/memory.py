@@ -7,6 +7,25 @@ class InMemoryStore:
     def __init__(self):
         self._sessions: dict[str, dict] = {}
         self._strategies: dict[str, dict] = {}
+        self._clarifications: dict[str, dict] = {}
+
+    # --- Clarification sessions ---
+
+    def create_clarification(self, session_id: str, thesis: str, questions: dict):
+        self._clarifications[session_id] = {
+            "id": session_id,
+            "thesis": thesis,
+            "questions": questions,
+            "answers": {},
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+
+    def set_clarification_answers(self, session_id: str, answers: dict[str, str]):
+        if session_id in self._clarifications:
+            self._clarifications[session_id]["answers"] = answers
+
+    def get_clarification(self, session_id: str) -> dict | None:
+        return self._clarifications.get(session_id)
 
     # --- Sessions (active agent runs) ---
 
@@ -17,6 +36,7 @@ class InMemoryStore:
             "status": "running",
             "created_at": datetime.now(timezone.utc).isoformat(),
             "data": {},
+            "steps": [],
         }
 
     def update_session(self, session_id: str, data: dict):
@@ -25,6 +45,10 @@ class InMemoryStore:
 
     def get_session(self, session_id: str) -> dict | None:
         return self._sessions.get(session_id)
+
+    def add_session_step(self, session_id: str, step: dict):
+        if session_id in self._sessions:
+            self._sessions[session_id]["steps"].append(step)
 
     def finalize_session(self, session_id: str):
         session = self._sessions.get(session_id)
@@ -46,6 +70,7 @@ class InMemoryStore:
             "strategy_params": session["data"].get("strategy_params"),
             "benchmark_comparison": session["data"].get("benchmark_comparison"),
             "reasoning": None,
+            "steps": session.get("steps", []),
         }
 
     # --- Strategies ---
@@ -66,3 +91,4 @@ class InMemoryStore:
 
 
 store = InMemoryStore()
+

@@ -1,5 +1,46 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001";
 
+import type { ClarificationResponse } from "@/types";
+
+export async function clarifyThesis(thesis: string): Promise<ClarificationResponse> {
+  const res = await fetch(`${API_BASE}/api/agent/clarify`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ thesis }),
+  });
+  if (!res.ok) throw new Error(`Clarification failed: ${res.statusText}`);
+  return res.json();
+}
+
+export async function submitClarificationAnswers(
+  sessionId: string,
+  answers: Record<string, string>,
+): Promise<void> {
+  const res = await fetch(`${API_BASE}/api/agent/clarify/answers`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ session_id: sessionId, answers }),
+  });
+  if (!res.ok) throw new Error(`Submit answers failed: ${res.statusText}`);
+}
+
+export async function runAgentWithContext(
+  sessionId: string,
+  onEvent: (event: string, data: Record<string, unknown>) => void,
+): Promise<void> {
+  const response = await fetch(`${API_BASE}/api/agent/run-with-context`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ session_id: sessionId }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Agent run failed: ${response.statusText}`);
+  }
+
+  await _processSSEStream(response, onEvent);
+}
+
 export async function runAgent(
   thesis: string,
   onEvent: (event: string, data: Record<string, unknown>) => void,
@@ -14,6 +55,13 @@ export async function runAgent(
     throw new Error(`Agent run failed: ${response.statusText}`);
   }
 
+  await _processSSEStream(response, onEvent);
+}
+
+async function _processSSEStream(
+  response: Response,
+  onEvent: (event: string, data: Record<string, unknown>) => void,
+): Promise<void> {
   const reader = response.body?.getReader();
   if (!reader) throw new Error("No response body");
 

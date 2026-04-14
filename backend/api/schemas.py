@@ -7,6 +7,19 @@ class AgentRunRequest(BaseModel):
     thesis: str
 
 
+class AgentClarifyRequest(BaseModel):
+    thesis: str
+
+
+class AgentRunWithContextRequest(BaseModel):
+    session_id: str
+
+
+class ClarifyAnswersRequest(BaseModel):
+    session_id: str
+    answers: dict[str, str]
+
+
 class ApproveRequest(BaseModel):
     pass
 

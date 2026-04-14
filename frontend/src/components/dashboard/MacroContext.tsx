@@ -14,22 +14,22 @@ const TREND_ICON = {
 };
 
 const TREND_COLOR = {
-  rising: "text-green-600",
-  falling: "text-red-600",
-  stable: "text-zinc-500",
+  rising: "text-emerald-400",
+  falling: "text-red-400",
+  stable: "text-zinc-400",
 };
 
 const ALIGNMENT_COLORS: Record<string, string> = {
-  strong: "bg-green-50 text-green-700",
-  moderate: "bg-amber-50 text-amber-700",
-  weak: "bg-orange-50 text-orange-700",
-  conflicting: "bg-red-50 text-red-700",
+  strong: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+  moderate: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+  weak: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+  conflicting: "bg-red-500/10 text-red-400 border-red-500/20",
 };
 
 const CYCLE_LABELS: Record<string, string> = {
-  expansion: "Expansion",
+  expansion: "Expansión",
   peak: "Pico",
-  contraction: "Contraccion",
+  contraction: "Contracción",
   trough: "Valle",
 };
 
@@ -41,28 +41,30 @@ export function MacroContext({ data }: MacroContextProps) {
   ];
 
   return (
-    <div className="bg-white rounded-xl border border-zinc-200 p-6 animate-in">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-zinc-500">Contexto Macroeconomico</h3>
+    <div className="glass rounded-2xl p-6 animate-in">
+      <div className="flex items-center justify-between mb-5">
+        <h3 className="text-sm font-semibold text-zinc-300 tracking-wide uppercase">
+          Contexto Macro
+        </h3>
         <div className="flex gap-2">
-          <span className={`text-xs font-medium px-2 py-1 rounded-full bg-blue-50 text-blue-700`}>
+          <span className="text-[10px] font-medium px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
             {CYCLE_LABELS[data.cycle_phase] || data.cycle_phase}
           </span>
-          <span className={`text-xs font-medium px-2 py-1 rounded-full ${ALIGNMENT_COLORS[data.thesis_alignment] || "bg-zinc-50 text-zinc-700"}`}>
-            Alineacion: {data.thesis_alignment}
+          <span className={`text-[10px] font-medium px-2.5 py-1 rounded-full border ${ALIGNMENT_COLORS[data.thesis_alignment] || "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"}`}>
+            Alineación: {data.thesis_alignment}
           </span>
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mb-4">
+      <div className="grid grid-cols-3 gap-3 mb-4">
         {indicators.map((ind) => {
           const Icon = TREND_ICON[ind.trend] || Minus;
-          const color = TREND_COLOR[ind.trend] || "text-zinc-500";
+          const color = TREND_COLOR[ind.trend] || "text-zinc-400";
           return (
-            <div key={ind.label} className="flex items-center justify-between bg-zinc-50 rounded-lg px-4 py-3">
+            <div key={ind.label} className="flex items-center justify-between bg-white/[0.03] rounded-xl px-4 py-3 border border-white/[0.04]">
               <div>
-                <p className="text-xs text-zinc-400">{ind.label}</p>
-                <p className="text-lg font-semibold text-zinc-900">{ind.value}</p>
+                <p className="text-[10px] text-zinc-500 uppercase tracking-wider">{ind.label}</p>
+                <p className="text-lg font-bold text-white mt-0.5">{ind.value}</p>
               </div>
               <Icon className={`w-5 h-5 ${color}`} />
             </div>
@@ -71,7 +73,7 @@ export function MacroContext({ data }: MacroContextProps) {
       </div>
 
       {data.summary && (
-        <p className="text-xs text-zinc-500 leading-relaxed">{data.summary}</p>
+        <p className="text-xs text-zinc-400 leading-relaxed">{data.summary}</p>
       )}
     </div>
   );

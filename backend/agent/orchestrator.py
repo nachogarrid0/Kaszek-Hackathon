@@ -16,6 +16,7 @@ import anthropic
 
 from config import settings
 from agent.system_prompt import SYSTEM_PROMPT
+from agent.clarification_prompt import CLARIFICATION_PROMPT
 from agent.tools import TOOLS
 from agent.handlers import dispatch_tool
 from store.memory import store
@@ -26,14 +27,73 @@ MAX_ITERATIONS = 30
 MAX_TOKENS = 8192
 
 
-async def run_agent(thesis: str) -> AsyncGenerator[str, None]:
+async def generate_clarification_questions(thesis: str) -> dict:
+    """Use Claude to generate smart clarification questions based on the thesis."""
+    client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
+
+    response = client.messages.create(
+        model=settings.model,
+        max_tokens=2048,
+        system=CLARIFICATION_PROMPT,
+        messages=[{"role": "user", "content": thesis}],
+    )
+
+    text = ""
+    for block in response.content:
+        if block.type == "text":
+            text += block.text
+
+    # Parse JSON from Claude's response
+    try:
+        result = json.loads(text.strip())
+    except json.JSONDecodeError:
+        # Try to extract JSON from markdown code block
+        import re
+        match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', text, re.DOTALL)
+        if match:
+            result = json.loads(match.group(1))
+        else:
+            result = {
+                "intro_message": "¡Entendido! Necesito hacerte algunas preguntas antes de analizar tu idea.",
+                "questions": [
+                    {
+                        "id": "horizon",
+                        "question": "¿Cuál es tu horizonte de inversión?",
+                        "type": "select",
+                        "options": ["Corto plazo (< 6 meses)", "Mediano plazo (6 meses - 2 años)", "Largo plazo (> 2 años)"],
+                        "required": True,
+                    },
+                    {
+                        "id": "risk",
+                        "question": "¿Cuál es tu tolerancia al riesgo?",
+                        "type": "select",
+                        "options": ["Conservador", "Moderado", "Agresivo"],
+                        "required": True,
+                    },
+                    {
+                        "id": "capital",
+                        "question": "¿Cuánto capital planeas invertir (en USD)?",
+                        "type": "number",
+                        "placeholder": "Ej: 10000",
+                        "required": True,
+                    },
+                ],
+            }
+
+    return result
+
+
+async def run_agent(thesis: str, enriched_context: str | None = None) -> AsyncGenerator[str, None]:
     """Run the autonomous agent loop with streaming. Yields SSE events."""
 
     client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
     strategy_id = str(uuid.uuid4())[:8]
 
+    # Build the user message with enriched context if available
+    user_message = enriched_context if enriched_context else thesis
+
     store.create_session(strategy_id, thesis)
-    messages = [{"role": "user", "content": thesis}]
+    messages = [{"role": "user", "content": user_message}]
 
     yield _sse("session_start", {"strategy_id": strategy_id})
     yield _sse("status", {"message": "Conectando con Claude..."})
