@@ -29,7 +29,7 @@ export function SentimentAnalysis({ data }: SentimentAnalysisProps) {
     <div className="glass rounded-2xl p-6 animate-in">
       <div className="flex items-center justify-between mb-5">
         <h3 className="text-sm font-semibold text-zinc-300 tracking-wide uppercase">
-          Análisis de Sentimiento
+          Sentiment Analysis
         </h3>
         <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.03] border border-white/[0.06]">
           <RegimeIcon className={`w-3.5 h-3.5 ${regime.color}`} />
@@ -46,7 +46,7 @@ export function SentimentAnalysis({ data }: SentimentAnalysisProps) {
                 {sentiment.label}
               </span>
             </div>
-            <p className="text-[10px] text-zinc-500 mb-2">{sentiment.article_count} artículos analizados</p>
+            <p className="text-[10px] text-zinc-500 mb-2">{sentiment.article_count} articles analyzed</p>
             {sentiment.top_headlines.length > 0 && (
               <ul className="space-y-1.5">
                 {sentiment.top_headlines.slice(0, 3).map((headline, i) => (
@@ -69,7 +69,7 @@ export function SentimentAnalysis({ data }: SentimentAnalysisProps) {
 
       {data.risk_events.length > 0 && (
         <div className="mt-4 pt-4 border-t border-white/[0.06]">
-          <p className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider mb-2">Eventos de riesgo</p>
+          <p className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider mb-2">Risk events</p>
           {data.risk_events.slice(0, 3).map((ev, i) => (
             <div key={i} className="flex items-center justify-between text-xs mb-1.5">
               <span className="text-zinc-400">{ev.event}</span>

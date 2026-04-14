@@ -68,17 +68,17 @@ export function StrategySummary({ data }: StrategySummaryProps) {
   if (!hasAllocations && !hasRules) return null;
 
   const rebalanceLabels: Record<string, string> = {
-    monthly: "Mensual",
-    quarterly: "Trimestral",
-    yearly: "Anual",
-    on_signal: "Por senal",
-    none: "Sin rebalanceo",
+    monthly: "Monthly",
+    quarterly: "Quarterly",
+    yearly: "Yearly",
+    on_signal: "On signal",
+    none: "No rebalancing",
   };
 
   return (
     <div className="glass rounded-2xl p-6 animate-in">
       <h3 className="text-sm font-semibold text-zinc-300 tracking-wide uppercase mb-5">
-        Estrategia Definida
+        Defined Strategy
       </h3>
 
       {/* Allocations as horizontal bars */}
@@ -86,7 +86,7 @@ export function StrategySummary({ data }: StrategySummaryProps) {
         <div className="mb-5">
           <p className="text-[10px] text-zinc-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
             <TrendingUp className="w-3 h-3" />
-            Asignacion del Portfolio
+            Portfolio Allocation
           </p>
           <div className="space-y-2">
             {Object.entries(allocations)
@@ -116,7 +116,7 @@ export function StrategySummary({ data }: StrategySummaryProps) {
           <div className="bg-white/[0.02] rounded-xl p-4 border border-white/[0.04]">
             <p className="text-[10px] text-zinc-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
               <Target className="w-3 h-3 text-emerald-400" />
-              Reglas de Entrada
+              Entry Rules
             </p>
             <div className="space-y-2">
               {entryRules.rsi_oversold != null && (
@@ -127,17 +127,17 @@ export function StrategySummary({ data }: StrategySummaryProps) {
               )}
               {entryRules.require_above_sma200 != null && (
                 <div className="flex justify-between text-xs">
-                  <span className="text-zinc-500">Sobre SMA200</span>
+                  <span className="text-zinc-500">Above SMA200</span>
                   <span className={`font-medium ${entryRules.require_above_sma200 ? "text-emerald-400" : "text-zinc-500"}`}>
-                    {entryRules.require_above_sma200 ? "Requerido" : "No"}
+                    {entryRules.require_above_sma200 ? "Required" : "No"}
                   </span>
                 </div>
               )}
               {entryRules.macd_crossover != null && (
                 <div className="flex justify-between text-xs">
-                  <span className="text-zinc-500">MACD Cruce</span>
+                  <span className="text-zinc-500">MACD Crossover</span>
                   <span className={`font-medium ${entryRules.macd_crossover ? "text-emerald-400" : "text-zinc-500"}`}>
-                    {entryRules.macd_crossover ? "Requerido" : "No"}
+                    {entryRules.macd_crossover ? "Required" : "No"}
                   </span>
                 </div>
               )}
@@ -150,7 +150,7 @@ export function StrategySummary({ data }: StrategySummaryProps) {
           <div className="bg-white/[0.02] rounded-xl p-4 border border-white/[0.04]">
             <p className="text-[10px] text-zinc-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
               <Shield className="w-3 h-3 text-red-400" />
-              Reglas de Salida
+              Exit Rules
             </p>
             <div className="space-y-2">
               {exitRules.stop_loss_pct != null && (
@@ -185,7 +185,7 @@ export function StrategySummary({ data }: StrategySummaryProps) {
       {/* Rebalance frequency */}
       <div className="mt-4 flex items-center gap-2 text-xs text-zinc-500">
         <RefreshCw className="w-3 h-3" />
-        <span>Rebalanceo: <span className="text-zinc-300 font-medium">{rebalanceLabels[rebalance] || rebalance}</span></span>
+        <span>Rebalancing: <span className="text-zinc-300 font-medium">{rebalanceLabels[rebalance] || rebalance}</span></span>
       </div>
     </div>
   );

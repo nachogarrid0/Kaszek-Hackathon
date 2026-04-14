@@ -73,9 +73,9 @@ function EmptyState({
   disabled: boolean;
 }) {
   const examples = [
-    "Creo que la IA va a dominar el mercado los proximos 2 anos",
-    "Quiero invertir en energia renovable, tengo $5000",
-    "Creo que las big tech estan baratas despues de la correccion",
+    "I think AI will dominate the market over the next 2 years",
+    "I want to invest in renewable energy, I have $5000",
+    "I think big tech is cheap after the recent correction",
   ];
 
   return (
@@ -90,8 +90,8 @@ function EmptyState({
       </div>
       <h2 className="text-xl font-semibold text-white mb-2">TradeMind AI</h2>
       <p className="text-sm text-zinc-400 max-w-sm leading-relaxed">
-        Escribí tu tesis de inversión en lenguaje natural y voy a convertirla en
-        una estrategia cuantificada y backtestada.
+        Write your investment thesis in natural language and I will convert it into
+        a quantified, backtested strategy.
       </p>
       <div className="mt-6 space-y-2 w-full max-w-sm">
         {examples.map((example) => (

@@ -54,27 +54,27 @@ async def generate_clarification_questions(thesis: str) -> dict:
             result = json.loads(match.group(1))
         else:
             result = {
-                "intro_message": "¡Entendido! Necesito hacerte algunas preguntas antes de analizar tu idea.",
+                "intro_message": "Got it! I need to ask you a few questions before analyzing your idea.",
                 "questions": [
                     {
                         "id": "horizon",
-                        "question": "¿Cuál es tu horizonte de inversión?",
+                        "question": "What is your investment horizon?",
                         "type": "select",
-                        "options": ["Corto plazo (< 6 meses)", "Mediano plazo (6 meses - 2 años)", "Largo plazo (> 2 años)"],
+                        "options": ["Short-term (< 6 months)", "Medium-term (6 months - 2 years)", "Long-term (> 2 years)"],
                         "required": True,
                     },
                     {
                         "id": "risk",
-                        "question": "¿Cuál es tu tolerancia al riesgo?",
+                        "question": "What is your risk tolerance?",
                         "type": "select",
-                        "options": ["Conservador", "Moderado", "Agresivo"],
+                        "options": ["Conservative", "Moderate", "Aggressive"],
                         "required": True,
                     },
                     {
                         "id": "capital",
-                        "question": "¿Cuánto capital planeas invertir (en USD)?",
+                        "question": "How much capital do you plan to invest (in USD)?",
                         "type": "number",
-                        "placeholder": "Ej: 10000",
+                        "placeholder": "e.g. 10000",
                         "required": True,
                     },
                 ],
@@ -96,7 +96,7 @@ async def run_agent(thesis: str, enriched_context: str | None = None) -> AsyncGe
     messages = [{"role": "user", "content": user_message}]
 
     yield _sse("session_start", {"strategy_id": strategy_id})
-    yield _sse("status", {"message": "Conectando con Claude..."})
+    yield _sse("status", {"message": "Connecting to Claude..."})
 
     usage_totals = {"input_tokens": 0, "output_tokens": 0}
     total_tool_calls = 0
@@ -187,10 +187,10 @@ async def run_agent(thesis: str, enriched_context: str | None = None) -> AsyncGe
                 yield _sse("usage", usage_totals)
 
         except anthropic.APIError as e:
-            yield _sse("error", {"message": f"Error de API: {e.message}"})
+            yield _sse("error", {"message": f"API Error: {e.message}"})
             break
         except Exception as e:
-            yield _sse("error", {"message": f"Error inesperado: {str(e)}"})
+            yield _sse("error", {"message": f"Unexpected error: {str(e)}"})
             logger.exception("Agent loop error")
             break
 
@@ -205,7 +205,7 @@ async def run_agent(thesis: str, enriched_context: str | None = None) -> AsyncGe
         if stop_reason == "max_tokens":
             messages.append({
                 "role": "user",
-                "content": "Tu respuesta fue truncada. Continua donde te quedaste.",
+                "content": "Your response was truncated. Please continue where you left off.",
             })
             continue
 
@@ -261,7 +261,7 @@ async def run_agent(thesis: str, enriched_context: str | None = None) -> AsyncGe
 
     else:
         yield _sse("chat_message", {
-            "content": "He alcanzado el limite maximo de iteraciones. Presentando los mejores resultados obtenidos.",
+            "content": "I have reached the maximum number of iterations. Presenting the best results obtained.",
         })
 
     store.finalize_session(strategy_id)
@@ -283,34 +283,34 @@ def _sse(event: str, data: dict) -> str:
 
 def _tool_thinking_message(tool_name: str) -> str:
     return {
-        "get_economic_indicators": "Analizando el contexto macroeconomico...",
-        "get_company_overview": "Evaluando los fundamentales de la empresa...",
-        "get_news_sentiment": "Analizando noticias y sentimiento del mercado...",
-        "get_price_history": "Descargando datos historicos de precios...",
-        "get_technical_indicators": "Calculando indicadores tecnicos...",
-        "run_backtest": "Ejecutando backtest de la estrategia...",
-        "update_dashboard": "Actualizando el dashboard...",
-    }.get(tool_name, "Procesando...")
+        "get_economic_indicators": "Analyzing macroeconomic context...",
+        "get_company_overview": "Evaluating company fundamentals...",
+        "get_news_sentiment": "Analyzing news and market sentiment...",
+        "get_price_history": "Downloading historical price data...",
+        "get_technical_indicators": "Computing technical indicators...",
+        "run_backtest": "Running strategy backtest...",
+        "update_dashboard": "Updating dashboard...",
+    }.get(tool_name, "Processing...")
 
 
 def _tool_input_preview(tool_name: str, tool_input: dict) -> str:
     """Short preview of what the tool is being called with."""
     if tool_name == "get_company_overview":
-        return f"Empresa: {tool_input.get('symbol', '?')}"
+        return f"Company: {tool_input.get('symbol', '?')}"
     if tool_name == "get_price_history":
-        return f"{tool_input.get('symbol', '?')} — {tool_input.get('period_years', 3)} anos"
+        return f"{tool_input.get('symbol', '?')} — {tool_input.get('period_years', 3)} years"
     if tool_name == "get_technical_indicators":
-        return f"Indicadores para {tool_input.get('symbol', '?')}"
+        return f"Indicators for {tool_input.get('symbol', '?')}"
     if tool_name == "get_news_sentiment":
-        return f"Noticias de {tool_input.get('tickers', '?')}"
+        return f"News for {tool_input.get('tickers', '?')}"
     if tool_name == "get_economic_indicators":
         inds = tool_input.get("indicators", [])
-        return f"Indicadores: {', '.join(inds[:3])}"
+        return f"Indicators: {', '.join(inds[:3])}"
     if tool_name == "run_backtest":
         allocs = tool_input.get("strategy", {}).get("allocations", {})
         return f"Portfolio: {', '.join(f'{k} {v}%' for k, v in list(allocs.items())[:4])}"
     if tool_name == "update_dashboard":
-        return f"Seccion: {tool_input.get('type', '?')}"
+        return f"Section: {tool_input.get('type', '?')}"
     return ""
 
 
@@ -324,22 +324,22 @@ def _tool_result_preview(tool_name: str, result: dict) -> str:
         pe = metrics.get("pe_ratio")
         return f"{profile.get('name', '?')} — P/E: {pe}" if pe else profile.get("name", "OK")
     if tool_name == "get_price_history":
-        return f"{result.get('data_points', 0)} dias de datos ({result.get('start_date', '?')} a {result.get('end_date', '?')})"
+        return f"{result.get('data_points', 0)} days of data ({result.get('start_date', '?')} to {result.get('end_date', '?')})"
     if tool_name == "get_news_sentiment":
         tickers = result.get("news_by_ticker", {})
         total = sum(t.get("article_count", 0) for t in tickers.values())
-        return f"{total} articulos analizados para {len(tickers)} activos"
+        return f"{total} articles analyzed for {len(tickers)} assets"
     if tool_name == "get_technical_indicators":
         comp = result.get("computed_indicators", {})
         rsi = comp.get("rsi_14")
-        return f"RSI: {rsi}, Precio vs SMA200: {comp.get('price_vs_sma200', '?')}" if rsi else "OK"
+        return f"RSI: {rsi}, Price vs SMA200: {comp.get('price_vs_sma200', '?')}" if rsi else "OK"
     if tool_name == "run_backtest":
         perf = result.get("performance", {})
-        return f"Retorno: {perf.get('total_return_pct', 0)}%, Sharpe: {perf.get('sharpe_ratio', 0)}, Drawdown: {perf.get('max_drawdown_pct', 0)}%"
+        return f"Return: {perf.get('total_return_pct', 0)}%, Sharpe: {perf.get('sharpe_ratio', 0)}, Drawdown: {perf.get('max_drawdown_pct', 0)}%"
     if tool_name == "get_economic_indicators":
         inds = result.get("indicators", {})
         events = result.get("upcoming_events", [])
-        return f"{len(inds)} indicadores + {len(events)} eventos proximos"
+        return f"{len(inds)} indicators + {len(events)} upcoming events"
     return "OK"
 
 

@@ -24,7 +24,7 @@ export function AssetAllocation({ assets }: AssetAllocationProps) {
   return (
     <div className="glass rounded-2xl p-6 animate-in">
       <h3 className="text-sm font-semibold text-zinc-300 tracking-wide uppercase mb-5">
-        Asignación de Activos
+        Asset Allocation
       </h3>
 
       <div className="flex items-start gap-6">
@@ -74,7 +74,7 @@ export function AssetAllocation({ assets }: AssetAllocationProps) {
           <div key={a.ticker} className="text-xs text-zinc-500">
             <span className="font-medium text-zinc-300">{a.ticker}:</span>{" "}
             {a.pe_ratio ? `P/E ${a.pe_ratio}` : ""}{" "}
-            {a.profit_margin && a.profit_margin !== "N/A" ? `| Margen ${a.profit_margin}` : ""}{" "}
+            {a.profit_margin && a.profit_margin !== "N/A" ? `| Margin ${a.profit_margin}` : ""}{" "}
             {a.analyst_consensus ? `| ${a.analyst_consensus}` : ""}
           </div>
         ))}

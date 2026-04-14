@@ -14,10 +14,10 @@ export function StrategyList() {
           <Inbox className="w-8 h-8 text-zinc-600" />
         </div>
         <p className="text-sm text-zinc-400">
-          No tenés estrategias guardadas todavía
+          No saved strategies yet
         </p>
         <p className="text-xs text-zinc-500 mt-1">
-          Creá una nueva estrategia desde el chat
+          Create a new strategy from the chat
         </p>
       </div>
     );

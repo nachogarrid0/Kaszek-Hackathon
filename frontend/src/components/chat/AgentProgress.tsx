@@ -76,7 +76,7 @@ export function AgentProgress() {
                         ))}
                     </div>
                     <span className="text-xs text-zinc-500 italic">
-                        Analizando...
+                        Analyzing...
                     </span>
                 </div>
             )}

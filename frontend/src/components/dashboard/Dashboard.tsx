@@ -42,7 +42,7 @@ export function Dashboard() {
           </div>
         </div>
         <p className="text-sm text-zinc-500 max-w-xs leading-relaxed">
-          El dashboard se construirá automáticamente mientras el agente analiza tu tesis de inversión
+          The dashboard will build automatically as the agent analyzes your investment thesis
         </p>
         <div className="mt-4 flex gap-1">
           {[0, 1, 2].map((i) => (

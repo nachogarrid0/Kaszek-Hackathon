@@ -27,15 +27,15 @@ const ALIGNMENT_COLORS: Record<string, string> = {
 };
 
 const CYCLE_LABELS: Record<string, string> = {
-  expansion: "Expansión",
-  peak: "Pico",
-  contraction: "Contracción",
-  trough: "Valle",
+  expansion: "Expansion",
+  peak: "Peak",
+  contraction: "Contraction",
+  trough: "Trough",
 };
 
 export function MacroContext({ data }: MacroContextProps) {
   const indicators = [
-    { label: "Tasa Fed", value: `${data.fed_rate.current}%`, trend: data.fed_rate.trend },
+    { label: "Fed Rate", value: `${data.fed_rate.current}%`, trend: data.fed_rate.trend },
     { label: "CPI", value: `${data.cpi.current}%`, trend: data.cpi.trend },
     { label: "Treasury 10Y", value: `${data.treasury_10y.current}%`, trend: data.treasury_10y.trend },
   ];
@@ -44,14 +44,14 @@ export function MacroContext({ data }: MacroContextProps) {
     <div className="glass rounded-2xl p-6 animate-in">
       <div className="flex items-center justify-between mb-5">
         <h3 className="text-sm font-semibold text-zinc-300 tracking-wide uppercase">
-          Contexto Macro
+          Macro Context
         </h3>
         <div className="flex gap-2">
           <span className="text-[10px] font-medium px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
             {CYCLE_LABELS[data.cycle_phase] || data.cycle_phase}
           </span>
           <span className={`text-[10px] font-medium px-2.5 py-1 rounded-full border ${ALIGNMENT_COLORS[data.thesis_alignment] || "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"}`}>
-            Alineación: {data.thesis_alignment}
+            Alignment: {data.thesis_alignment}
           </span>
         </div>
       </div>

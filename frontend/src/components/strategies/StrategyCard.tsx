@@ -33,11 +33,11 @@ interface StrategyCardProps {
 }
 
 const TOOL_LABELS: Record<string, string> = {
-  get_economic_indicators: "Indicadores Macro",
-  get_company_overview: "Fundamentales",
-  get_news_sentiment: "Sentimiento",
-  get_price_history: "Datos de Precios",
-  get_technical_indicators: "Indicadores Técnicos",
+  get_economic_indicators: "Macro Indicators",
+  get_company_overview: "Fundamentals",
+  get_news_sentiment: "Sentiment",
+  get_price_history: "Price Data",
+  get_technical_indicators: "Technical Indicators",
   run_backtest: "Backtest",
   update_dashboard: "Dashboard Update",
 };
@@ -66,19 +66,19 @@ export function StrategyCard({ strategy }: StrategyCardProps) {
                   year: "numeric",
                   hour: "2-digit",
                   minute: "2-digit",
-                })
+                }, "en")
                 : ""}
             </p>
             {steps.length > 0 && (
               <span className="text-[10px] text-zinc-500 flex items-center gap-1">
                 <Clock className="w-2.5 h-2.5" />
-                {(totalDuration / 1000).toFixed(1)}s · {steps.length} pasos
+                {(totalDuration / 1000).toFixed(1)}s · {steps.length} steps
               </span>
             )}
             {errorSteps.length > 0 && (
               <span className="text-[10px] text-red-400 flex items-center gap-1">
                 <AlertTriangle className="w-2.5 h-2.5" />
-                {errorSteps.length} error{errorSteps.length > 1 ? "es" : ""}
+                {errorSteps.length} error{errorSteps.length > 1 ? "s" : ""}
               </span>
             )}
           </div>
@@ -91,7 +91,7 @@ export function StrategyCard({ strategy }: StrategyCardProps) {
       {perf && (
         <div className="grid grid-cols-3 gap-3 mt-3">
           <div className="bg-white/[0.03] rounded-lg px-3 py-2">
-            <p className="text-[10px] text-zinc-500">Retorno</p>
+            <p className="text-[10px] text-zinc-500">Return</p>
             <p
               className={`text-sm font-bold ${isPositive ? "text-emerald-400" : "text-red-400"
                 }`}
@@ -138,8 +138,8 @@ export function StrategyCard({ strategy }: StrategyCardProps) {
             ) : (
               <ChevronDown className="w-3 h-3" />
             )}
-            {showSteps ? "Ocultar" : "Ver"} log de ejecución ({steps.length}{" "}
-            pasos)
+            {showSteps ? "Hide" : "View"} execution log ({steps.length}{" "}
+            steps)
           </button>
 
           {showSteps && (

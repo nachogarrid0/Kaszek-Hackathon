@@ -19,7 +19,7 @@ export function LiveLayout({ strategyId }: LiveLayoutProps) {
       <div className="flex items-center gap-3 px-6 py-3 border-b border-white/[0.06] bg-[var(--bg-surface)]">
         <div className={`w-2 h-2 rounded-full ${status === "running" ? "bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.5)]" : "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)]"}`} />
         <span className="text-sm text-zinc-300 font-medium tracking-wide">
-          {status === "running" ? "Live Trading Activo" : "⚠ Trading pausado — esperando aprobación"}
+          {status === "running" ? "Live Trading Active" : "⚠ Trading paused — awaiting approval"}
         </span>
       </div>
 

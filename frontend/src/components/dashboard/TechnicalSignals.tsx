@@ -23,7 +23,7 @@ export function TechnicalSignals({ signals }: TechnicalSignalsProps) {
   return (
     <div className="glass rounded-2xl p-6 animate-in">
       <h3 className="text-sm font-semibold text-zinc-300 tracking-wide uppercase mb-5">
-        Señales Técnicas
+        Technical Signals
       </h3>
 
       <div className="space-y-3">
@@ -45,7 +45,7 @@ export function TechnicalSignals({ signals }: TechnicalSignalsProps) {
             {/* Signal strength bar */}
             <div className="mb-4">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] text-zinc-500">Fuerza de señal</span>
+                <span className="text-[10px] text-zinc-500">Signal strength</span>
                 <span className="text-[10px] text-zinc-400">{(sig.signal_strength * 100).toFixed(0)}%</span>
               </div>
               <div className="h-1.5 bg-white/[0.04] rounded-full overflow-hidden">
@@ -79,8 +79,8 @@ export function TechnicalSignals({ signals }: TechnicalSignalsProps) {
                       sig.macd_signal.includes("bearish") ? "text-red-400" : "text-zinc-400"
                   }`}>
                   {!sig.macd_signal ? "-" :
-                    sig.macd_signal.includes("bullish") ? "Alcista" :
-                      sig.macd_signal.includes("bearish") ? "Bajista" : "Neutral"}
+                    sig.macd_signal.includes("bullish") ? "Bullish" :
+                      sig.macd_signal.includes("bearish") ? "Bearish" : "Neutral"}
                 </p>
               </div>
               <div className="bg-white/[0.02] rounded-lg py-2">
@@ -89,19 +89,19 @@ export function TechnicalSignals({ signals }: TechnicalSignalsProps) {
                     sig.price_vs_sma200 === "above" ? "text-emerald-400" : "text-red-400"
                   }`}>
                   {!sig.price_vs_sma200 ? "-" :
-                    sig.price_vs_sma200 === "above" ? "Arriba" : "Abajo"}
+                    sig.price_vs_sma200 === "above" ? "Above" : "Below"}
                 </p>
               </div>
               <div className="bg-white/[0.02] rounded-lg py-2">
-                <p className="text-[10px] text-zinc-500 mb-0.5">Tendencia</p>
+                <p className="text-[10px] text-zinc-500 mb-0.5">Trend</p>
                 <p className="text-sm font-bold text-white">
-                  {sig.trend === "uptrend" ? "Alcista" : sig.trend === "downtrend" ? "Bajista" : "Lateral"}
+                  {sig.trend === "uptrend" ? "Uptrend" : sig.trend === "downtrend" ? "Downtrend" : "Sideways"}
                 </p>
               </div>
             </div>
 
             <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/[0.04] text-xs text-zinc-500">
-              <span>Entrada: <span className="text-zinc-300">${sig.entry_zone.low.toFixed(2)} - ${sig.entry_zone.high.toFixed(2)}</span></span>
+              <span>Entry: <span className="text-zinc-300">${sig.entry_zone.low.toFixed(2)} - ${sig.entry_zone.high.toFixed(2)}</span></span>
               <span>Stop: <span className="text-red-400">${sig.stop_loss.toFixed(2)}</span></span>
               <span>Target: <span className="text-emerald-400">${sig.targets[0]?.toFixed(2) || "N/A"}</span></span>
             </div>

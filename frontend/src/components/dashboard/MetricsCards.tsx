@@ -12,7 +12,7 @@ export function MetricsCards({ performance, benchmark }: MetricsCardsProps) {
   const p = performance;
   const cards = [
     {
-      label: "Retorno Total",
+      label: "Total Return",
       value: `${p.total_return_pct > 0 ? "+" : ""}${p.total_return_pct}%`,
       icon: p.total_return_pct >= 0 ? TrendingUp : TrendingDown,
       color: p.total_return_pct >= 0 ? "text-emerald-400" : "text-red-400",
@@ -85,11 +85,11 @@ export function MetricsCards({ performance, benchmark }: MetricsCardsProps) {
             <p className="text-sm font-bold text-white mt-1">{benchmark.beta}</p>
           </div>
           <div className="glass rounded-xl p-3 text-center">
-            <p className="text-[10px] text-zinc-500">Mejor mes</p>
+            <p className="text-[10px] text-zinc-500">Best month</p>
             <p className="text-sm font-bold text-emerald-400 mt-1">+{p.best_month_pct}%</p>
           </div>
           <div className="glass rounded-xl p-3 text-center">
-            <p className="text-[10px] text-zinc-500">Peor mes</p>
+            <p className="text-[10px] text-zinc-500">Worst month</p>
             <p className="text-sm font-bold text-red-400 mt-1">{p.worst_month_pct}%</p>
           </div>
         </div>

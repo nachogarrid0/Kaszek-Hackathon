@@ -60,18 +60,31 @@ BULL_TRADES = [
     {"action": "BUY", "symbol": "NVDA", "qty": 5, "price": 928.3},
 ]
 
+def generate_agent_messages(thesis: str, symbols: list[str]) -> list[str]:
+    sym1 = symbols[0] if len(symbols) > 0 else "ASSET"
+    sym2 = symbols[1] if len(symbols) > 1 else sym1
+    return [
+        f"Monitoreando la tesis: '{thesis[:40]}...'. {sym1} muestra un setup favorable.",
+        f"{sym2} se encuentra consolidando en zona clave. Manteniendo exposición actual.",
+        f"Las condiciones del mercado favorecen el enfoque de la estrategia. Ajustando parámetros de {sym1}.",
+        f"Aceleración de volumen detectada en {sym2}. Mantenemos stop-loss dinámico.",
+        f"Correlaciones actualizadas. La diversificación entre {sym1} y {sym2} aporta estabilidad.",
+        f"Métricas de riesgo dentro de los límites estipulados. Operando en rango normal.",
+    ]
 
 async def live_trading_stream(strategy_id: str):
-    # Determine scenario based on strategy_id (or just default)
-    # We will simulate a "bull" scenario dynamically using the assets from the actual strategy if available
     strategy = store.get_strategy(strategy_id)
+    thesis = strategy.get("thesis", "Estrategia genérica") if strategy else "Estrategia genérica"
     
     positions = []
-    if strategy and strategy.get("assets"):
-        # Initialize positions from strategy assets
+    symbols = []
+    is_demo = not strategy or not strategy.get("assets")
+    
+    if not is_demo:
         for idx, asset in enumerate(strategy["assets"]):
             ticker = asset.get("ticker", f"AST{idx}")
-            entry = random.uniform(100, 500)
+            symbols.append(ticker)
+            entry = random.uniform(10, 500)
             positions.append({
                 "symbol": ticker,
                 "entry_price": entry,
@@ -81,15 +94,16 @@ async def live_trading_stream(strategy_id: str):
                 "status": "HOLD",
                 "quantity": 100,
             })
+        agent_msgs = generate_agent_messages(thesis, symbols)
     else:
-        # Fallback default positions
+        symbols = ["AAPL", "MSFT", "NVDA"]
         positions = [
             {"symbol": "AAPL", "entry_price": 182.4, "current_price": 191.2, "pnl_usd": 880, "pnl_pct": 4.83, "status": "HOLD", "quantity": 100},
             {"symbol": "MSFT", "entry_price": 415.0, "current_price": 424.8, "pnl_usd": 980, "pnl_pct": 2.36, "status": "HOLD", "quantity": 100},
             {"symbol": "NVDA", "entry_price": 875.8, "current_price": 921.5, "pnl_usd": 4570, "pnl_pct": 5.22, "status": "BUY", "quantity": 100},
         ]
+        agent_msgs = BULL_AGENT_MESSAGES
 
-    # Initial portfolio
     portfolio = build_portfolio(positions)
     yield f"data: {json.dumps({'event': 'portfolio_update', 'data': portfolio})}\n\n"
     
@@ -101,44 +115,42 @@ async def live_trading_stream(strategy_id: str):
         await asyncio.sleep(4)
         cycle += 1
         
-        # Check if strategy was approved (for rotation scenarios)
-        # We'll just stream steady updates for now. The mock logic had intervals:
-        # Every 8s: agent message
-        # Every 4s: trade executed + portfolio update
-        
-        # 1. Update Portfolio Prices
         positions = [delta(p, round(random.uniform(-0.45, 0.45) * 1.5, 2)) for p in positions]
         portfolio = build_portfolio(positions)
         yield f"data: {json.dumps({'event': 'portfolio_update', 'data': portfolio})}\n\n"
 
-        # 2. Agent Message (every 8s approx)
         if cycle % 2 == 0:
-            content = BULL_AGENT_MESSAGES[msg_idx % len(BULL_AGENT_MESSAGES)]
+            content = agent_msgs[msg_idx % len(agent_msgs)]
             msg_idx += 1
             yield f"data: {json.dumps({'event': 'agent_message', 'data': {'content': content, 'timestamp': ts()}})}\n\n"
             
-        # 3. Trade (every 4s)
-        trade = BULL_TRADES[trade_idx % len(BULL_TRADES)]
+        if is_demo:
+            trade = BULL_TRADES[trade_idx % len(BULL_TRADES)].copy()
+        else:
+            trade_sym = symbols[trade_idx % len(symbols)]
+            trade_action = random.choice(["BUY", "BUY", "SELL", "HOLD"])
+            trade_qty = random.randint(1, 15) if trade_action != "HOLD" else 0
+            trade_price = next((p["current_price"] for p in positions if p["symbol"] == trade_sym), 100.0)
+            trade = {"action": trade_action, "symbol": trade_sym, "qty": trade_qty, "price": trade_price}
+
         trade_idx += 1
-        # Overwrite symbol to match one of our actual positions if possible
-        if len(positions) > 0:
-            trade["symbol"] = positions[trade_idx % len(positions)]["symbol"]
             
         yield f"data: {json.dumps({'event': 'trade_executed', 'data': {**trade, 'timestamp': ts()}})}\n\n"
 
-        # 4. Strategy Obsolete Trigger
-        if cycle == 8: # After ~32 seconds, trigger a strategy obsolete event
+        if cycle == 8:
+            sym_rot = symbols[0] if symbols else "ASSET"
             pending = {
-                "reason": f"Detecté un cambio de régimen en el sector. Propongo rotación sectorial.",
+                "reason": f"Detecté un cambio de régimen que invalida temporalmente la tesis '{thesis[:20]}...'. Propongo rotación defensiva.",
                 "old_strategy": {"assets": [{"symbol": p["symbol"], "allocation": 20} for p in positions]},
-                "new_strategy": {"assets": [{"symbol": "GLD", "allocation": 50}, {"symbol": "TLT", "allocation": 50}]},
+                "new_strategy": {"assets": [{"symbol": "GLD", "allocation": 50}, {"symbol": "BIL", "allocation": 50}]},
                 "changes": [
-                    "- Salida total de exposición agresiva de acciones.",
-                    "+ Incremento en activos refugio como ORO y bonos (GLD, TLT).",
-                    "Stop-loss general ajustado al 2%."
+                    f"- Salida total de exposición agresiva de {sym_rot}.",
+                    "+ Incremento en activos refugio como ORO y bonos (GLD, BIL).",
+                    "Stop-loss general ajustado al 1.5%."
                 ]
             }
             yield f"data: {json.dumps({'event': 'strategy_obsolete', 'data': pending})}\n\n"
+
             
             # Pause emitting until approval logic is handled (or simulate infinite loop waiting)
             # In real implementation we'd check an approval flag in memory store

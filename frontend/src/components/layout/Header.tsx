@@ -22,13 +22,13 @@ export function Header() {
           href="/app"
           className="text-sm text-zinc-400 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/5 transition-all"
         >
-          Nueva Estrategia
+          New Strategy
         </Link>
         <Link
           href="/strategies"
           className="text-sm text-zinc-400 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/5 transition-all"
         >
-          Mis Estrategias
+          My Strategies
         </Link>
         <Link
           href="/live/demo?scenario=rotation"

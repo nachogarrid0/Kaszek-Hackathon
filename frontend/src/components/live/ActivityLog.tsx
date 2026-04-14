@@ -36,7 +36,7 @@ export function ActivityLog({ tradeLog, strategyLog }: ActivityLogProps) {
         </div>
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-2 font-mono">
           {tradeLog.length === 0 && (
-            <p className="text-sm text-zinc-600 italic font-sans">Sin operaciones aún...</p>
+            <p className="text-sm text-zinc-600 italic font-sans">No trades yet...</p>
           )}
           {tradeLog.map((entry, i) => (
             <div key={`${entry.timestamp}-${entry.symbol}-${i}`} className="flex items-center gap-2.5 text-xs animate-in fade-in duration-200">

@@ -17,15 +17,15 @@ export function StrategyApprovalOverlay({ pending, onApprove }: StrategyApproval
             <AlertTriangle className="w-6 h-6 text-amber-400" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-white tracking-tight">Trading Interrumpido</h3>
-            <p className="text-sm text-zinc-400">Estrategia actual requiere rotación</p>
+            <h3 className="text-lg font-bold text-white tracking-tight">Trading Interrupted</h3>
+            <p className="text-sm text-zinc-400">Current strategy requires rotation</p>
           </div>
         </div>
 
         <p className="text-sm text-zinc-300 mb-6 leading-relaxed bg-white/[0.03] p-4 rounded-xl border border-white/[0.05]">{pending.reason}</p>
 
         <div className="bg-black/40 rounded-xl p-5 mb-8 space-y-2.5 border border-white/[0.05]">
-          <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3">Cambios Previstos</p>
+          <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3">Proposed Changes</p>
           {pending.changes.map((change, i) => (
             <div key={i} className="flex items-start gap-3 text-sm">
               <span className={`font-mono font-bold text-sm mt-0.5 ${change.startsWith("+") ? "text-emerald-400" : change.startsWith("-") ? "text-red-400" : "text-zinc-500"}`}>
@@ -42,14 +42,14 @@ export function StrategyApprovalOverlay({ pending, onApprove }: StrategyApproval
             className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] text-zinc-300 text-sm font-medium transition-all"
           >
             <X className="w-4 h-4" />
-            Rechazar rotación
+            Reject rotation
           </button>
           <button
             onClick={() => onApprove(true)}
             className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 border border-blue-500/50 text-white text-sm font-semibold shadow-[0_0_15px_rgba(79,70,229,0.3)] transition-all"
           >
             <Check className="w-4 h-4" />
-            Aprobar estrategia
+            Approve strategy
           </button>
         </div>
       </div>

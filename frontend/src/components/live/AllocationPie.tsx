@@ -14,7 +14,7 @@ export function AllocationPie({ portfolio }: AllocationPieProps) {
 
   return (
     <div className="glass rounded-2xl p-5 flex-1 hover:border-white/[0.12] transition-colors">
-      <h3 className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-4">Allocación del Portfolio</h3>
+      <h3 className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider mb-4">Portfolio Allocation</h3>
       <div className="flex items-center gap-5">
         <div className="w-32 h-32 shrink-0">
           <ResponsiveContainer width="100%" height="100%">
