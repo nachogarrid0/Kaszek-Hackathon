@@ -66,20 +66,30 @@ export function TechnicalSignals({ signals }: TechnicalSignalsProps) {
             <div className="grid grid-cols-4 gap-3 text-center">
               <div className="bg-white/[0.02] rounded-lg py-2">
                 <p className="text-[10px] text-zinc-500 mb-0.5">RSI</p>
-                <p className={`text-sm font-bold ${sig.rsi > 70 ? "text-red-400" : sig.rsi < 30 ? "text-emerald-400" : "text-white"}`}>
-                  {sig.rsi.toFixed(1)}
+                <p className={`text-sm font-bold ${sig.rsi == null ? "text-zinc-600" :
+                    sig.rsi > 70 ? "text-red-400" : sig.rsi < 30 ? "text-emerald-400" : "text-white"
+                  }`}>
+                  {sig.rsi != null ? sig.rsi.toFixed(1) : "-"}
                 </p>
               </div>
               <div className="bg-white/[0.02] rounded-lg py-2">
                 <p className="text-[10px] text-zinc-500 mb-0.5">MACD</p>
-                <p className={`text-sm font-bold ${sig.macd_signal.includes("bullish") ? "text-emerald-400" : sig.macd_signal.includes("bearish") ? "text-red-400" : "text-zinc-400"}`}>
-                  {sig.macd_signal.includes("bullish") ? "Alcista" : sig.macd_signal.includes("bearish") ? "Bajista" : "Neutral"}
+                <p className={`text-sm font-bold ${!sig.macd_signal ? "text-zinc-600" :
+                    sig.macd_signal.includes("bullish") ? "text-emerald-400" :
+                      sig.macd_signal.includes("bearish") ? "text-red-400" : "text-zinc-400"
+                  }`}>
+                  {!sig.macd_signal ? "-" :
+                    sig.macd_signal.includes("bullish") ? "Alcista" :
+                      sig.macd_signal.includes("bearish") ? "Bajista" : "Neutral"}
                 </p>
               </div>
               <div className="bg-white/[0.02] rounded-lg py-2">
                 <p className="text-[10px] text-zinc-500 mb-0.5">vs SMA200</p>
-                <p className={`text-sm font-bold ${sig.price_vs_sma200 === "above" ? "text-emerald-400" : "text-red-400"}`}>
-                  {sig.price_vs_sma200 === "above" ? "Arriba" : "Abajo"}
+                <p className={`text-sm font-bold ${!sig.price_vs_sma200 ? "text-zinc-600" :
+                    sig.price_vs_sma200 === "above" ? "text-emerald-400" : "text-red-400"
+                  }`}>
+                  {!sig.price_vs_sma200 ? "-" :
+                    sig.price_vs_sma200 === "above" ? "Arriba" : "Abajo"}
                 </p>
               </div>
               <div className="bg-white/[0.02] rounded-lg py-2">

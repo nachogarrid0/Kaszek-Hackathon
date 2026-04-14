@@ -68,7 +68,9 @@ async def handle_get_economic_indicators(input_data: dict, strategy_id: str) -> 
 
     upcoming_events = []
     if isinstance(calendar, dict) and "economicCalendar" in calendar:
-        events = calendar["economicCalendar"].get("result", [])
+        raw = calendar["economicCalendar"]
+        # Finnhub returns either a list directly or a dict with "result" key
+        events = raw if isinstance(raw, list) else (raw.get("result", []) if isinstance(raw, dict) else [])
         for ev in events[:15]:
             upcoming_events.append({
                 "date": ev.get("time", ""),

@@ -123,6 +123,8 @@ export function useAgent() {
   }
 
   function _handleAgentEvent(event: string, data: Record<string, unknown>) {
+    console.log(`[useAgent] SSE Event: ${event}`, data);
+
     switch (event) {
       case "session_start":
         store.setStrategyId(data.strategy_id as string);
@@ -136,10 +138,10 @@ export function useAgent() {
       case "text_delta":
         break;
 
-      // Complete text block — store it (overwrite, so we always keep the LAST one)
+      // Complete text block — accumulate silently (no chat bubble during analysis)
+      // All text blocks get concatenated and flushed as ONE message on "done"
       case "chat_message":
-        store.clearAgentText();
-        store.appendAgentText(data.content as string);
+        store.appendAgentText(data.content as string + "\n\n");
         store.setCurrentStatusText(null);
         break;
 
@@ -172,8 +174,6 @@ export function useAgent() {
         });
         store.setToolProgress(null);
         store.setCurrentStatusText(null);
-        // Clear accumulated text after each tool result (it was reasoning)
-        store.clearAgentText();
         break;
 
       case "dashboard_update":
@@ -181,9 +181,11 @@ export function useAgent() {
         break;
 
       case "usage":
+        console.log(`[useAgent] Usage updated:`, data);
         break;
 
       case "error":
+        console.error(`[useAgent] Agent Error:`, data.message);
         store.addMessage({
           id: crypto.randomUUID(),
           role: "assistant",
@@ -193,6 +195,7 @@ export function useAgent() {
         break;
 
       case "done":
+        console.log(`[useAgent] Done event received, finalizing chat...`);
         // Add the final accumulated text as ONE clean chat message
         const finalText = store.agentAccumulatedText.trim();
         if (finalText) {
@@ -210,6 +213,8 @@ export function useAgent() {
   }
 
   function handleDashboardUpdate(update: { type: string; data: Record<string, unknown> }) {
+    console.log(`[useAgent] Dashboard Update: ${update.type}`, update.data);
+
     switch (update.type) {
       case "macro_context":
         store.setMacroContext(update.data as unknown as MacroContext);
@@ -234,6 +239,8 @@ export function useAgent() {
         store.setFinalStrategy(update.data);
         store.setComplete(true);
         break;
+      default:
+        console.warn(`[useAgent] Unrecognized dashboard update type: ${update.type}`);
     }
   }
 

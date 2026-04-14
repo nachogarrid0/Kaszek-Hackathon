@@ -8,6 +8,7 @@ import { TechnicalSignals } from "./TechnicalSignals";
 import { MetricsCards } from "./MetricsCards";
 import { EquityCurve } from "./EquityCurve";
 import { ApproveButton } from "./ApproveButton";
+import { StrategySummary } from "./StrategySummary";
 import { BarChart3, Sparkles } from "lucide-react";
 
 export function Dashboard() {
@@ -17,6 +18,7 @@ export function Dashboard() {
     sentimentAnalysis,
     technicalSignals,
     backtestResult,
+    finalStrategy,
     strategyId,
     isComplete,
   } = useAppStore();
@@ -68,6 +70,9 @@ export function Dashboard() {
 
       {/* Phase 2: Technical signals */}
       {technicalSignals && <TechnicalSignals signals={technicalSignals} />}
+
+      {/* Phase 3: Strategy summary (entry/exit rules) */}
+      {finalStrategy && <StrategySummary data={finalStrategy} />}
 
       {/* Phase 3: Backtest results */}
       {backtestResult && (
