@@ -39,7 +39,7 @@ export function ActivityLog({ tradeLog, strategyLog }: ActivityLogProps) {
             <p className="text-xs text-zinc-400 italic font-sans">Sin operaciones aún...</p>
           )}
           {tradeLog.map((entry, i) => (
-            <div key={i} className="flex items-center gap-2 text-xs animate-in fade-in duration-200">
+            <div key={`${entry.timestamp}-${entry.symbol}-${i}`} className="flex items-center gap-2 text-xs animate-in fade-in duration-200">
               <span className="text-zinc-400 shrink-0">{entry.timestamp}</span>
               <span className={ACTION_STYLES[entry.action]}>{entry.action}</span>
               <span className="text-zinc-700 font-semibold">{entry.symbol}</span>

@@ -11,6 +11,12 @@ interface GainsPieProps {
 
 export function GainsPie({ portfolio }: GainsPieProps) {
   const raw = portfolio.gains_pie;
+
+  // Stable color per symbol so pie slices and legend always match
+  const colorMap = Object.fromEntries(
+    raw.map((d, i) => [d.symbol, COLORS[i % COLORS.length]])
+  );
+
   const positiveData = raw.filter((d) => d.gain > 0).map((d) => ({ name: d.symbol, value: d.gain }));
   const displayData = positiveData.length > 0 ? positiveData : [{ name: "–", value: 1 }];
 
@@ -22,8 +28,8 @@ export function GainsPie({ portfolio }: GainsPieProps) {
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie data={displayData} cx="50%" cy="50%" innerRadius={28} outerRadius={52} paddingAngle={2} dataKey="value">
-                {displayData.map((_, i) => (
-                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                {displayData.map((d) => (
+                  <Cell key={d.name} fill={colorMap[d.name] ?? COLORS[0]} />
                 ))}
               </Pie>
               <Tooltip formatter={(v) => (typeof v === "number" ? `$${v.toFixed(0)}` : "–")} contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #e4e4e7" }} />
@@ -31,10 +37,10 @@ export function GainsPie({ portfolio }: GainsPieProps) {
           </ResponsiveContainer>
         </div>
         <div className="flex-1 space-y-1.5">
-          {raw.map((d, i) => (
+          {raw.map((d) => (
             <div key={d.symbol} className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: colorMap[d.symbol] }} />
                 <span className="text-xs font-medium text-zinc-800">{d.symbol}</span>
               </div>
               <span className={`text-xs font-semibold ${d.gain >= 0 ? "text-green-600" : "text-red-500"}`}>

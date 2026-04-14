@@ -143,6 +143,7 @@ export function startMockSession(
   onEvent: (event: LiveEvent) => void
 ): MockSession {
   const intervals: ReturnType<typeof setInterval>[] = [];
+  const timeouts: ReturnType<typeof setTimeout>[] = [];
   let stopped = false;
   let awaitingApproval = false;
 
@@ -206,13 +207,14 @@ export function startMockSession(
       awaitingApproval = true;
       onEvent({ event: "strategy_obsolete", data: ROTATION_PENDING });
     }, 30000);
-    intervals.push(obsoleteTimeout as unknown as ReturnType<typeof setInterval>);
+    timeouts.push(obsoleteTimeout);
   }
 
   return {
     stop() {
       stopped = true;
       intervals.forEach(clearInterval);
+      timeouts.forEach(clearTimeout);
     },
     approve(approved: boolean) {
       awaitingApproval = false;
