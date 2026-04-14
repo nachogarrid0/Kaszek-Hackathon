@@ -5,22 +5,21 @@ import { PortfolioDashboard } from "./PortfolioDashboard";
 import { ActivityLog } from "./ActivityLog";
 import { StrategyApprovalOverlay } from "./StrategyApprovalOverlay";
 import { useLiveTrading } from "@/hooks/useLiveTrading";
-import type { Scenario } from "@/services/mockLiveTrading";
 
 interface LiveLayoutProps {
-  scenario?: Scenario;
+  strategyId: string;
 }
 
-export function LiveLayout({ scenario = "bull" }: LiveLayoutProps) {
+export function LiveLayout({ strategyId }: LiveLayoutProps) {
   const { status, portfolio, agentMessages, tradeLog, strategyLog, pendingChange, approve } =
-    useLiveTrading(scenario);
+    useLiveTrading(strategyId);
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center gap-3 px-6 py-3 border-b border-zinc-200 bg-white">
-        <div className={`w-2 h-2 rounded-full ${status === "running" ? "bg-green-400 animate-pulse" : "bg-amber-400"}`} />
-        <span className="text-sm text-zinc-600">
-          {status === "running" ? "Live Trading activo" : "⚠ Trading pausado — esperando aprobación"}
+      <div className="flex items-center gap-3 px-6 py-3 border-b border-white/[0.06] bg-[var(--bg-surface)]">
+        <div className={`w-2 h-2 rounded-full ${status === "running" ? "bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.5)]" : "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)]"}`} />
+        <span className="text-sm text-zinc-300 font-medium tracking-wide">
+          {status === "running" ? "Live Trading Activo" : "⚠ Trading pausado — esperando aprobación"}
         </span>
       </div>
 

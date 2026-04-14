@@ -112,3 +112,32 @@ export async function listStrategies() {
   if (!res.ok) throw new Error("Failed to list strategies");
   return res.json();
 }
+
+export async function startLiveTradingStream(
+  strategyId: string,
+  onEvent: (event: string, data: Record<string, unknown>) => void,
+): Promise<{ stop: () => void }> {
+  const controller = new AbortController();
+  const response = await fetch(`${API_BASE}/api/live/${strategyId}/stream`, {
+    signal: controller.signal,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Live stream failed: ${response.statusText}`);
+  }
+
+  // Fire and forget the async processor
+  _processSSEStream(response, onEvent).catch(() => { });
+
+  return {
+    stop: () => controller.abort(),
+  };
+}
+
+export async function approveLiveTradingStrategy(strategyId: string, approved: boolean) {
+  const res = await fetch(`${API_BASE}/api/live/${strategyId}/approve?approved=${approved}`, {
+    method: "POST",
+  });
+  if (!res.ok) throw new Error("Failed to approve live trading");
+  return res.json();
+}

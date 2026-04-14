@@ -51,8 +51,11 @@ CURRENT_MACRO = {
 }
 
 
-async def handle_get_economic_indicators(input_data: dict, strategy_id: str) -> dict:
-    indicators = input_data.get("indicators", ["FEDERAL_FUNDS_RATE", "CPI", "TREASURY_YIELD"])
+async def handle_get_economic_indicators(input_data: dict | list, strategy_id: str) -> dict:
+    if isinstance(input_data, list):
+        indicators = input_data if len(input_data) > 0 and isinstance(input_data[0], str) else ["FEDERAL_FUNDS_RATE", "CPI", "TREASURY_YIELD"]
+    else:
+        indicators = input_data.get("indicators", ["FEDERAL_FUNDS_RATE", "CPI", "TREASURY_YIELD"])
 
     # Get hardcoded macro values
     result_indicators = {}

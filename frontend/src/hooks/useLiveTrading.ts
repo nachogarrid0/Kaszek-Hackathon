@@ -4,13 +4,9 @@ import type {
   TradeLogEntry,
   StrategyLogEntry,
   PendingStrategyChange,
+  LiveEvent,
 } from "@/types/live";
-import {
-  startMockSession,
-  getInitialPortfolio,
-  type Scenario,
-  type MockSession,
-} from "@/services/mockLiveTrading";
+import { startLiveTradingStream, approveLiveTradingStrategy } from "@/services/api";
 
 export interface LiveTradingHook {
   status: "running" | "awaiting_approval";
@@ -26,49 +22,78 @@ function nowStr(): string {
   return new Date().toLocaleTimeString("es-AR", { hour12: false });
 }
 
-export function useLiveTrading(scenario: Scenario = "bull"): LiveTradingHook {
+export function useLiveTrading(strategyId: string): LiveTradingHook {
   const [status, setStatus] = useState<"running" | "awaiting_approval">("running");
-  const [portfolio, setPortfolio] = useState<Portfolio>(() => getInitialPortfolio(scenario));
+  const [portfolio, setPortfolio] = useState<Portfolio>({
+    total_pnl: 0,
+    total_pnl_pct: 0,
+    daily_return: 0,
+    capital_at_risk: 0,
+    positions: [],
+    allocation_pie: [],
+    gains_pie: [],
+  });
   const [agentMessages, setAgentMessages] = useState<{ content: string; timestamp: string }[]>([]);
   const [tradeLog, setTradeLog] = useState<TradeLogEntry[]>([]);
   const [strategyLog, setStrategyLog] = useState<StrategyLogEntry[]>([
     { type: "loaded", message: "Estrategia inicial cargada", timestamp: nowStr() },
   ]);
   const [pendingChange, setPendingChange] = useState<PendingStrategyChange | undefined>();
-  const sessionRef = useRef<MockSession | null>(null);
+
+  const stopFnRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
-    const session = startMockSession(scenario, (event) => {
-      if (event.event === "agent_message") {
-        setAgentMessages((prev) => [...prev, event.data]);
-      } else if (event.event === "trade_executed") {
-        setTradeLog((prev) => [event.data, ...prev]);
-      } else if (event.event === "portfolio_update") {
-        setPortfolio(event.data);
-      } else if (event.event === "strategy_obsolete") {
-        setPendingChange(event.data);
+    if (!strategyId) return;
+
+    let mounted = true;
+
+    startLiveTradingStream(strategyId, (event, data) => {
+      if (!mounted) return;
+      const liveEvent = { event, data } as unknown as LiveEvent;
+
+      if (liveEvent.event === "agent_message") {
+        setAgentMessages((prev) => [...prev, liveEvent.data]);
+      } else if (liveEvent.event === "trade_executed") {
+        setTradeLog((prev) => [liveEvent.data, ...prev]);
+      } else if (liveEvent.event === "portfolio_update") {
+        setPortfolio(liveEvent.data);
+      } else if (liveEvent.event === "strategy_obsolete") {
+        setPendingChange(liveEvent.data);
         setStatus("awaiting_approval");
         setStrategyLog((prev) => [
           ...prev,
           { type: "obsolete", message: "Agente detectó obsolescencia → esperando aprobación", timestamp: nowStr() },
         ]);
       }
+    }).then(({ stop }) => {
+      if (!mounted) stop();
+      else stopFnRef.current = stop;
     });
-    sessionRef.current = session;
-    return () => session.stop();
-  }, [scenario]);
 
-  const approve = useCallback((approved: boolean) => {
-    sessionRef.current?.approve(approved);
-    setPendingChange(undefined);
-    setStatus("running");
-    setStrategyLog((prev) => [
-      ...prev,
-      approved
-        ? { type: "approved", message: "Usuario aprobó → nueva estrategia activa", timestamp: nowStr() }
-        : { type: "rejected", message: "Usuario rechazó → se mantiene estrategia anterior", timestamp: nowStr() },
-    ]);
-  }, []);
+    return () => {
+      mounted = false;
+      if (stopFnRef.current) stopFnRef.current();
+    };
+  }, [strategyId]);
+
+  const approve = useCallback(
+    async (approved: boolean) => {
+      try {
+        await approveLiveTradingStrategy(strategyId, approved);
+        setPendingChange(undefined);
+        setStatus("running");
+        setStrategyLog((prev) => [
+          ...prev,
+          approved
+            ? { type: "approved", message: "Usuario aprobó → nueva estrategia activa", timestamp: nowStr() }
+            : { type: "rejected", message: "Usuario rechazó → se mantiene estrategia anterior", timestamp: nowStr() },
+        ]);
+      } catch (err) {
+        console.error("Failed to approve live trading", err);
+      }
+    },
+    [strategyId]
+  );
 
   return { status, portfolio, agentMessages, tradeLog, strategyLog, pendingChange, approve };
 }

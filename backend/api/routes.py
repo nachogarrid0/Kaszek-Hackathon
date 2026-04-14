@@ -11,6 +11,7 @@ from api.schemas import (
     StrategyResponse,
 )
 from agent.orchestrator import run_agent, generate_clarification_questions
+from agent.live_trading import live_trading_stream
 from store.memory import store
 
 router = APIRouter()
@@ -109,3 +110,25 @@ async def approve_strategy(strategy_id: str):
 @router.get("/strategies")
 async def list_strategies():
     return store.list_strategies()
+
+
+@router.get("/live/{strategy_id}/stream")
+async def live_stream(strategy_id: str):
+    """Start a real-time SSE stream for Live Trading."""
+    return StreamingResponse(
+        live_trading_stream(strategy_id),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
+
+
+@router.post("/live/{strategy_id}/approve")
+async def live_approve(strategy_id: str, approved: bool = True):
+    """Approve or reject a live strategy rotation."""
+    # En una iteración futura esto afectaría la bandera de aprobación en la memoria del strategy session
+    # por ahora devolvemos OK para el flow.
+    return {"status": "ok", "approved": approved}
