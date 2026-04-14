@@ -1,14 +1,15 @@
 "use client";
 
 import type { Strategy } from "@/types";
-import { TrendingUp, TrendingDown, CheckCircle } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 
 interface StrategyCardProps {
   strategy: Strategy;
 }
 
 export function StrategyCard({ strategy }: StrategyCardProps) {
-  const isPositive = (strategy.metrics?.total_return ?? 0) >= 0;
+  const perf = strategy.backtest_result?.performance;
+  const isPositive = (perf?.total_return_pct ?? 0) >= 0;
 
   return (
     <div className="bg-white rounded-xl border border-zinc-200 p-6 hover:border-zinc-300 transition-colors">
@@ -26,25 +27,21 @@ export function StrategyCard({ strategy }: StrategyCardProps) {
         )}
       </div>
 
-      {strategy.metrics && (
+      {perf && (
         <div className="grid grid-cols-3 gap-3 mt-4">
           <div>
             <p className="text-xs text-zinc-400">Retorno</p>
             <p className={`text-sm font-semibold ${isPositive ? "text-green-600" : "text-red-600"}`}>
-              {isPositive ? "+" : ""}{strategy.metrics.total_return}%
+              {isPositive ? "+" : ""}{perf.total_return_pct}%
             </p>
           </div>
           <div>
             <p className="text-xs text-zinc-400">Sharpe</p>
-            <p className="text-sm font-semibold text-zinc-900">
-              {strategy.metrics.sharpe_ratio}
-            </p>
+            <p className="text-sm font-semibold text-zinc-900">{perf.sharpe_ratio}</p>
           </div>
           <div>
             <p className="text-xs text-zinc-400">Drawdown</p>
-            <p className="text-sm font-semibold text-zinc-900">
-              {strategy.metrics.max_drawdown}%
-            </p>
+            <p className="text-sm font-semibold text-zinc-900">{perf.max_drawdown_pct}%</p>
           </div>
         </div>
       )}
@@ -52,11 +49,8 @@ export function StrategyCard({ strategy }: StrategyCardProps) {
       {strategy.assets && strategy.assets.length > 0 && (
         <div className="flex gap-1.5 mt-3 flex-wrap">
           {strategy.assets.map((a) => (
-            <span
-              key={a.symbol}
-              className="text-xs bg-zinc-100 text-zinc-600 px-2 py-0.5 rounded-full"
-            >
-              {a.symbol}
+            <span key={a.ticker} className="text-xs bg-zinc-100 text-zinc-600 px-2 py-0.5 rounded-full">
+              {a.ticker}
             </span>
           ))}
         </div>

@@ -1,141 +1,192 @@
 TOOLS = [
     {
-        "name": "identify_assets",
+        "name": "get_economic_indicators",
         "description": (
-            "Identifica los activos (acciones, ETFs, crypto) más relevantes "
-            "para la tesis de inversión del usuario. Devuelve una lista de "
-            "activos con porcentaje de asignación sugerido y razón."
+            "Fetches macroeconomic context: current values of key indicators "
+            "(Federal Funds Rate, CPI, Treasury Yield) and upcoming economic events "
+            "from the calendar. Use this at the START of your analysis to understand "
+            "the macro environment before selecting assets.\n\n"
+            "Returns current indicator values with trends, plus upcoming macro events "
+            "(FOMC meetings, CPI releases, GDP reports, etc.)."
         ),
         "input_schema": {
             "type": "object",
             "properties": {
-                "thesis": {
-                    "type": "string",
-                    "description": "La tesis de inversión del usuario en lenguaje natural",
-                },
-                "risk_tolerance": {
-                    "type": "string",
-                    "enum": ["conservative", "moderate", "aggressive"],
-                    "description": "Tolerancia al riesgo inferida del usuario",
-                },
-                "investment_horizon": {
-                    "type": "string",
-                    "enum": ["short", "medium", "long"],
-                    "description": "Horizonte temporal: short (<1y), medium (1-3y), long (>3y)",
+                "indicators": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "FEDERAL_FUNDS_RATE", "CPI", "INFLATION",
+                            "TREASURY_YIELD", "REAL_GDP", "UNEMPLOYMENT",
+                        ],
+                    },
+                    "description": "List of macro indicators to query",
                 },
             },
-            "required": ["thesis", "risk_tolerance", "investment_horizon"],
+            "required": ["indicators"],
         },
     },
     {
-        "name": "get_historical_data",
+        "name": "get_company_overview",
         "description": (
-            "Obtiene datos históricos OHLCV de uno o más activos. "
-            "Devuelve fechas, precios y volumen para cada símbolo."
+            "Fetches comprehensive fundamental data for a single company from Finnhub: "
+            "company profile (name, sector, market cap), financial metrics (PE ratio, "
+            "profit margin, revenue growth, ROE, beta, 52-week high/low), and analyst "
+            "recommendation trends (buy/hold/sell counts). Use this to evaluate the "
+            "fundamental quality of each asset you're considering."
         ),
         "input_schema": {
             "type": "object",
             "properties": {
-                "symbols": {
-                    "type": "array",
-                    "items": {"type": "string"},
-                    "description": "Lista de símbolos (ej: ['NVDA', 'MSFT', 'AAPL'])",
-                },
-                "period": {
+                "symbol": {
                     "type": "string",
-                    "enum": ["1y", "2y", "3y", "5y"],
-                    "description": "Período de datos históricos",
+                    "description": "Ticker symbol (e.g., 'NVDA')",
                 },
             },
-            "required": ["symbols", "period"],
+            "required": ["symbol"],
+        },
+    },
+    {
+        "name": "get_news_sentiment",
+        "description": (
+            "Fetches recent news articles for one or more tickers from Finnhub. "
+            "Returns headlines, sources, dates, and summaries. Since sentiment scores "
+            "are not available, YOU must analyze the headlines and summaries to determine "
+            "the market's directional bias.\n\n"
+            "Interpret sentiment yourself based on:\n"
+            "- Headline tone (positive/negative language)\n"
+            "- Article count and recency\n"
+            "- Presence of catalysts (earnings, product launches, regulation)\n"
+            "- Extreme clustering of positive or negative news"
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "tickers": {
+                    "type": "string",
+                    "description": "Comma-separated ticker symbols (e.g., 'NVDA,MSFT,GOOGL')",
+                },
+                "days_back": {
+                    "type": "integer",
+                    "description": "How many days of news to fetch (default 30, max 90)",
+                },
+            },
+            "required": ["tickers"],
+        },
+    },
+    {
+        "name": "get_price_history",
+        "description": (
+            "Fetches daily OHLCV (Open, High, Low, Close, Volume) price data from "
+            "Finnhub. Returns chronologically sorted daily candles. Also stores the "
+            "data in the session for use by the backtester and technical analysis."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "symbol": {
+                    "type": "string",
+                    "description": "Ticker symbol (e.g., 'NVDA')",
+                },
+                "period_years": {
+                    "type": "integer",
+                    "description": "Years of history to fetch (1-5, default 3)",
+                },
+            },
+            "required": ["symbol"],
+        },
+    },
+    {
+        "name": "get_technical_indicators",
+        "description": (
+            "Fetches technical analysis for a stock: aggregated buy/sell/neutral "
+            "signal counts from Finnhub, support/resistance levels, AND locally "
+            "computed indicators (RSI-14, SMA-50, SMA-200, MACD, Bollinger Bands, "
+            "ATR-14) from the price data already loaded.\n\n"
+            "IMPORTANT: You must call get_price_history for this symbol BEFORE calling "
+            "this tool, otherwise computed indicators will be unavailable.\n\n"
+            "Use the results to determine:\n"
+            "- RSI: >70 overbought, <30 oversold\n"
+            "- SMA200: price above = uptrend, below = downtrend\n"
+            "- MACD: crossover signals trend changes\n"
+            "- Bollinger: position shows if overextended\n"
+            "- ATR: defines stop-loss distance (typically 2x ATR)"
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "symbol": {
+                    "type": "string",
+                    "description": "Ticker symbol (e.g., 'NVDA')",
+                },
+            },
+            "required": ["symbol"],
         },
     },
     {
         "name": "run_backtest",
         "description": (
-            "Ejecuta un backtest de la estrategia de inversión contra datos "
-            "históricos. Devuelve métricas de rendimiento, curva de equity y "
-            "lista de trades."
+            "Executes a backtest of the complete portfolio strategy using the Python "
+            "engine with the price data already loaded. Returns: total_return, CAGR, "
+            "max_drawdown, Sharpe_ratio, Sortino_ratio, win_rate, profit_factor, "
+            "equity_curve, monthly_returns, benchmark comparison (SPY), and performance "
+            "by market regime (bull/bear/sideways).\n\n"
+            "IMPORTANT: You must call get_price_history for ALL assets (including SPY) "
+            "BEFORE calling this tool."
         ),
         "input_schema": {
             "type": "object",
             "properties": {
-                "assets": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "symbol": {"type": "string"},
-                            "allocation": {"type": "number"},
+                "strategy": {
+                    "type": "object",
+                    "properties": {
+                        "allocations": {
+                            "type": "object",
+                            "description": "Ticker → percentage map. Must sum to 100.",
                         },
-                        "required": ["symbol", "allocation"],
+                        "entry_rules": {
+                            "type": "object",
+                            "properties": {
+                                "rsi_oversold": {"type": "number"},
+                                "require_above_sma200": {"type": "boolean"},
+                                "macd_crossover": {"type": "boolean"},
+                            },
+                        },
+                        "exit_rules": {
+                            "type": "object",
+                            "properties": {
+                                "stop_loss_pct": {"type": "number"},
+                                "take_profit_pct": {"type": "number"},
+                                "trailing_stop_pct": {"type": "number"},
+                                "rsi_overbought": {"type": "number"},
+                            },
+                        },
+                        "rebalance_frequency": {
+                            "type": "string",
+                            "enum": ["monthly", "quarterly", "yearly", "on_signal"],
+                        },
                     },
-                    "description": "Activos con su porcentaje de asignación",
                 },
-                "initial_capital": {
-                    "type": "number",
-                    "description": "Capital inicial en USD",
-                    "default": 10000,
-                },
-                "stop_loss": {
-                    "type": "number",
-                    "description": "Stop-loss en porcentaje (ej: 5 = 5%)",
-                },
-                "take_profit": {
-                    "type": "number",
-                    "description": "Take-profit en porcentaje (ej: 15 = 15%)",
-                },
-                "rebalance_frequency": {
-                    "type": "string",
-                    "enum": ["monthly", "quarterly", "yearly", "none"],
-                    "description": "Frecuencia de rebalanceo del portfolio",
-                    "default": "quarterly",
-                },
-                "start_date": {
-                    "type": "string",
-                    "description": "Fecha inicio ISO (ej: 2021-01-01)",
-                },
-                "end_date": {
-                    "type": "string",
-                    "description": "Fecha fin ISO (ej: 2024-01-01)",
-                },
+                "initial_capital": {"type": "number"},
+                "period_years": {"type": "integer"},
             },
-            "required": ["assets", "initial_capital", "start_date", "end_date"],
-        },
-    },
-    {
-        "name": "compare_with_benchmark",
-        "description": (
-            "Compara la curva de equity de la estrategia contra un benchmark "
-            "(por defecto S&P500). Devuelve métricas comparativas."
-        ),
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "strategy_equity_curve": {
-                    "type": "array",
-                    "items": {"type": "number"},
-                    "description": "Curva de equity de la estrategia",
-                },
-                "strategy_dates": {
-                    "type": "array",
-                    "items": {"type": "string"},
-                    "description": "Fechas correspondientes a la curva de equity",
-                },
-                "benchmark": {
-                    "type": "string",
-                    "description": "Símbolo del benchmark (default: SPY)",
-                    "default": "SPY",
-                },
-            },
-            "required": ["strategy_equity_curve", "strategy_dates"],
+            "required": ["strategy", "initial_capital", "period_years"],
         },
     },
     {
         "name": "update_dashboard",
         "description": (
-            "Envía una actualización progresiva al dashboard del usuario. "
-            "Usá esta tool para ir mostrando los resultados en tiempo real."
+            "Sends structured data to the user's dashboard for real-time progressive "
+            "visualization. The frontend renders each type as a different dashboard "
+            "section. Call this after completing each major analysis step.\n\n"
+            "REQUIRED moments to call:\n"
+            "- After interpreting macro indicators → type 'macro_context'\n"
+            "- After selecting assets + running fundamentals → type 'assets_selected'\n"
+            "- After analyzing sentiment → type 'sentiment_analysis'\n"
+            "- After running technical analysis → type 'technical_signals'\n"
+            "- After each backtest run → type 'backtest_result'\n"
+            "- After the final strategy is ready → type 'final_strategy'"
         ),
         "input_schema": {
             "type": "object",
@@ -143,18 +194,17 @@ TOOLS = [
                 "type": {
                     "type": "string",
                     "enum": [
-                        "assets",
-                        "metrics",
-                        "equity_curve",
-                        "benchmark",
-                        "strategy_params",
-                        "strategy_complete",
+                        "macro_context",
+                        "assets_selected",
+                        "sentiment_analysis",
+                        "technical_signals",
+                        "backtest_result",
+                        "final_strategy",
                     ],
-                    "description": "Tipo de actualización del dashboard",
                 },
                 "data": {
                     "type": "object",
-                    "description": "Datos de la actualización (depende del type)",
+                    "description": "Structured payload for the dashboard section",
                 },
             },
             "required": ["type", "data"],

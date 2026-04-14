@@ -1,17 +1,21 @@
 from __future__ import annotations
 
-from agent.handlers.analyze_assets import handle_identify_assets
-from agent.handlers.get_market_data import handle_get_historical_data
+from agent.handlers.get_indicators import handle_get_economic_indicators
+from agent.handlers.get_overview import handle_get_company_overview
+from agent.handlers.get_sentiment import handle_get_news_sentiment
+from agent.handlers.get_prices import handle_get_price_history
+from agent.handlers.get_technicals import handle_get_technical_indicators
 from agent.handlers.run_backtest import handle_run_backtest
-from agent.handlers.build_strategy import handle_compare_with_benchmark
 from agent.handlers.update_dashboard import handle_update_dashboard
 
 
 HANDLER_MAP = {
-    "identify_assets": handle_identify_assets,
-    "get_historical_data": handle_get_historical_data,
+    "get_economic_indicators": handle_get_economic_indicators,
+    "get_company_overview": handle_get_company_overview,
+    "get_news_sentiment": handle_get_news_sentiment,
+    "get_price_history": handle_get_price_history,
+    "get_technical_indicators": handle_get_technical_indicators,
     "run_backtest": handle_run_backtest,
-    "compare_with_benchmark": handle_compare_with_benchmark,
     "update_dashboard": handle_update_dashboard,
 }
 

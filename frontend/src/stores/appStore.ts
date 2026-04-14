@@ -1,59 +1,81 @@
 import { create } from "zustand";
 import type {
   ChatMessage,
-  Asset,
-  Metrics,
-  EquityCurve,
-  BenchmarkComparison,
-  StrategyParams,
+  MacroContext,
+  AssetSelected,
+  SentimentAnalysis,
+  TechnicalSignal,
+  BacktestResult,
   Strategy,
 } from "@/types";
+
+export interface ToolProgress {
+  tool: string;
+  status: "running" | "done" | "error";
+  message: string;
+  inputPreview?: string;
+  resultPreview?: string;
+}
 
 interface AppState {
   // Chat
   messages: ChatMessage[];
   isStreaming: boolean;
   currentThinkingStep: string | null;
+  streamingMessageId: string | null;
+  toolProgress: ToolProgress | null;
 
-  // Dashboard
+  // Dashboard — progressive
   strategyId: string | null;
-  assets: Asset[];
-  metrics: Metrics | null;
-  equityCurve: EquityCurve | null;
-  benchmarkComparison: BenchmarkComparison | null;
-  strategyParams: StrategyParams | null;
+  macroContext: MacroContext | null;
+  selectedAssets: AssetSelected[];
+  sentimentAnalysis: SentimentAnalysis | null;
+  technicalSignals: Record<string, TechnicalSignal> | null;
+  backtestResult: BacktestResult | null;
+  finalStrategy: Record<string, unknown> | null;
   isComplete: boolean;
 
   // Strategies
   savedStrategies: Strategy[];
 
-  // Actions
+  // Actions — chat
   addMessage: (msg: ChatMessage) => void;
-  appendToLastMessage: (content: string) => void;
+  startStreamingMessage: () => string;
+  appendToStreamingMessage: (text: string) => void;
+  finishStreamingMessage: () => void;
   setStreaming: (streaming: boolean) => void;
   setThinkingStep: (step: string | null) => void;
+  setToolProgress: (tp: ToolProgress | null) => void;
+
+  // Actions — dashboard
   setStrategyId: (id: string) => void;
-  setAssets: (assets: Asset[]) => void;
-  setMetrics: (metrics: Metrics) => void;
-  setEquityCurve: (curve: EquityCurve) => void;
-  setBenchmarkComparison: (comparison: BenchmarkComparison) => void;
-  setStrategyParams: (params: StrategyParams) => void;
+  setMacroContext: (ctx: MacroContext) => void;
+  setSelectedAssets: (assets: AssetSelected[]) => void;
+  setSentimentAnalysis: (sa: SentimentAnalysis) => void;
+  setTechnicalSignals: (ts: Record<string, TechnicalSignal>) => void;
+  setBacktestResult: (bt: BacktestResult) => void;
+  setFinalStrategy: (fs: Record<string, unknown>) => void;
   setComplete: (complete: boolean) => void;
-  setSavedStrategies: (strategies: Strategy[]) => void;
   resetDashboard: () => void;
+
+  // Actions — strategies
+  setSavedStrategies: (strategies: Strategy[]) => void;
 }
 
-export const useAppStore = create<AppState>((set) => ({
+export const useAppStore = create<AppState>((set, get) => ({
   // Initial state
   messages: [],
   isStreaming: false,
   currentThinkingStep: null,
+  streamingMessageId: null,
+  toolProgress: null,
   strategyId: null,
-  assets: [],
-  metrics: null,
-  equityCurve: null,
-  benchmarkComparison: null,
-  strategyParams: null,
+  macroContext: null,
+  selectedAssets: [],
+  sentimentAnalysis: null,
+  technicalSignals: null,
+  backtestResult: null,
+  finalStrategy: null,
   isComplete: false,
   savedStrategies: [],
 
@@ -61,38 +83,70 @@ export const useAppStore = create<AppState>((set) => ({
   addMessage: (msg) =>
     set((state) => ({ messages: [...state.messages, msg] })),
 
-  appendToLastMessage: (content) =>
-    set((state) => {
-      const msgs = [...state.messages];
-      if (msgs.length > 0 && msgs[msgs.length - 1].role === "assistant") {
-        msgs[msgs.length - 1] = {
-          ...msgs[msgs.length - 1],
-          content: msgs[msgs.length - 1].content + content,
-        };
-      }
-      return { messages: msgs };
-    }),
+  startStreamingMessage: () => {
+    const id = crypto.randomUUID();
+    const msg: ChatMessage = {
+      id,
+      role: "assistant",
+      content: "",
+      timestamp: Date.now(),
+    };
+    set((state) => ({
+      messages: [...state.messages, msg],
+      streamingMessageId: id,
+    }));
+    return id;
+  },
+
+  appendToStreamingMessage: (text: string) => {
+    const { streamingMessageId } = get();
+    if (!streamingMessageId) return;
+    set((state) => ({
+      messages: state.messages.map((m) =>
+        m.id === streamingMessageId
+          ? { ...m, content: m.content + text }
+          : m,
+      ),
+    }));
+  },
+
+  finishStreamingMessage: () => {
+    const { streamingMessageId } = get();
+    if (!streamingMessageId) return;
+    // Remove empty streaming messages
+    set((state) => ({
+      messages: state.messages.filter(
+        (m) => m.id !== streamingMessageId || m.content.trim().length > 0,
+      ),
+      streamingMessageId: null,
+    }));
+  },
 
   setStreaming: (streaming) => set({ isStreaming: streaming }),
   setThinkingStep: (step) => set({ currentThinkingStep: step }),
+  setToolProgress: (tp) => set({ toolProgress: tp }),
   setStrategyId: (id) => set({ strategyId: id }),
-  setAssets: (assets) => set({ assets }),
-  setMetrics: (metrics) => set({ metrics }),
-  setEquityCurve: (curve) => set({ equityCurve: curve }),
-  setBenchmarkComparison: (comparison) => set({ benchmarkComparison: comparison }),
-  setStrategyParams: (params) => set({ strategyParams: params }),
+  setMacroContext: (ctx) => set({ macroContext: ctx }),
+  setSelectedAssets: (assets) => set({ selectedAssets: assets }),
+  setSentimentAnalysis: (sa) => set({ sentimentAnalysis: sa }),
+  setTechnicalSignals: (ts) => set({ technicalSignals: ts }),
+  setBacktestResult: (bt) => set({ backtestResult: bt }),
+  setFinalStrategy: (fs) => set({ finalStrategy: fs }),
   setComplete: (complete) => set({ isComplete: complete }),
   setSavedStrategies: (strategies) => set({ savedStrategies: strategies }),
 
   resetDashboard: () =>
     set({
       strategyId: null,
-      assets: [],
-      metrics: null,
-      equityCurve: null,
-      benchmarkComparison: null,
-      strategyParams: null,
+      macroContext: null,
+      selectedAssets: [],
+      sentimentAnalysis: null,
+      technicalSignals: null,
+      backtestResult: null,
+      finalStrategy: null,
       isComplete: false,
       currentThinkingStep: null,
+      toolProgress: null,
+      streamingMessageId: null,
     }),
 }));

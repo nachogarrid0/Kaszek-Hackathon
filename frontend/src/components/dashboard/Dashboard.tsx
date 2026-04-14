@@ -1,26 +1,32 @@
 "use client";
 
 import { useAppStore } from "@/stores/appStore";
+import { MacroContext } from "./MacroContext";
 import { AssetAllocation } from "./AssetAllocation";
+import { SentimentAnalysis } from "./SentimentAnalysis";
+import { TechnicalSignals } from "./TechnicalSignals";
 import { MetricsCards } from "./MetricsCards";
 import { EquityCurve } from "./EquityCurve";
-import { BenchmarkComparison } from "./BenchmarkComparison";
-import { StrategyDetails } from "./StrategyDetails";
 import { ApproveButton } from "./ApproveButton";
 import { BarChart3 } from "lucide-react";
 
 export function Dashboard() {
   const {
-    assets,
-    metrics,
-    equityCurve,
-    benchmarkComparison,
-    strategyParams,
+    macroContext,
+    selectedAssets,
+    sentimentAnalysis,
+    technicalSignals,
+    backtestResult,
     strategyId,
     isComplete,
   } = useAppStore();
 
-  const hasContent = assets.length > 0 || metrics || equityCurve;
+  const hasContent =
+    macroContext ||
+    selectedAssets.length > 0 ||
+    sentimentAnalysis ||
+    technicalSignals ||
+    backtestResult;
 
   if (!hasContent) {
     return (
@@ -37,27 +43,30 @@ export function Dashboard() {
 
   return (
     <div className="space-y-4 max-w-3xl mx-auto">
-      {/* Asset allocation */}
-      {assets.length > 0 && <AssetAllocation assets={assets} />}
+      {/* Phase 1: Macro context */}
+      {macroContext && <MacroContext data={macroContext} />}
 
-      {/* Metrics */}
-      {metrics && <MetricsCards metrics={metrics} />}
+      {/* Phase 1: Asset allocation with fundamentals */}
+      {selectedAssets.length > 0 && <AssetAllocation assets={selectedAssets} />}
 
-      {/* Equity curve */}
-      {equityCurve && (
-        <EquityCurve
-          equityCurve={equityCurve}
-          benchmarkCurve={benchmarkComparison?.benchmark.equity_curve}
-        />
+      {/* Phase 1: Sentiment */}
+      {sentimentAnalysis && <SentimentAnalysis data={sentimentAnalysis} />}
+
+      {/* Phase 2: Technical signals */}
+      {technicalSignals && <TechnicalSignals signals={technicalSignals} />}
+
+      {/* Phase 3: Backtest results */}
+      {backtestResult && (
+        <>
+          <MetricsCards
+            performance={backtestResult.performance}
+            benchmark={backtestResult.benchmark_comparison}
+          />
+          {backtestResult.equity_curve.length > 0 && (
+            <EquityCurve data={backtestResult.equity_curve} />
+          )}
+        </>
       )}
-
-      {/* Benchmark comparison */}
-      {benchmarkComparison && (
-        <BenchmarkComparison comparison={benchmarkComparison} />
-      )}
-
-      {/* Strategy details */}
-      {strategyParams && <StrategyDetails params={strategyParams} />}
 
       {/* Approve button */}
       {isComplete && strategyId && <ApproveButton strategyId={strategyId} />}

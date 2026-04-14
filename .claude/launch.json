@@ -11,8 +11,8 @@
     {
       "name": "backend",
       "runtimeExecutable": "uvicorn",
-      "runtimeArgs": ["main:app", "--reload", "--port", "8000"],
-      "port": 8000,
+      "runtimeArgs": ["main:app", "--reload", "--port", "8001"],
+      "port": 8001,
       "cwd": "backend"
     }
   ]
