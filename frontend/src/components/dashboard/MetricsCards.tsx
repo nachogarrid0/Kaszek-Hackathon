@@ -59,9 +59,9 @@ export function MetricsCards({ performance, benchmark }: MetricsCardsProps) {
     <div className="animate-in">
       <div className="grid grid-cols-3 gap-3">
         {cards.map((card) => (
-          <div key={card.label} className={`glass rounded-2xl p-4 shadow-lg ${card.glow}`}>
+          <div key={card.label} className={`bg-white border border-zinc-200 rounded-2xl p-4 shadow-sm`}>
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-white/[0.04] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-zinc-50 flex items-center justify-center border border-zinc-100">
                 <card.icon className={`w-4 h-4 ${card.color}`} />
               </div>
             </div>
@@ -74,23 +74,23 @@ export function MetricsCards({ performance, benchmark }: MetricsCardsProps) {
       {/* Benchmark comparison row */}
       {benchmark && (
         <div className="grid grid-cols-4 gap-3 mt-3">
-          <div className="glass rounded-xl p-3 text-center">
+          <div className="bg-white border border-zinc-200 rounded-xl p-3 text-center shadow-sm">
             <p className="text-[10px] text-zinc-500">Alpha vs SPY</p>
-            <p className={`text-sm font-bold mt-1 ${benchmark.alpha_pct >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+            <p className={`text-sm font-bold mt-1 ${benchmark.alpha_pct >= 0 ? "text-emerald-500" : "text-red-500"}`}>
               {benchmark.alpha_pct > 0 ? "+" : ""}{benchmark.alpha_pct}%
             </p>
           </div>
-          <div className="glass rounded-xl p-3 text-center">
+          <div className="bg-white border border-zinc-200 rounded-xl p-3 text-center shadow-sm">
             <p className="text-[10px] text-zinc-500">Beta</p>
-            <p className="text-sm font-bold text-white mt-1">{benchmark.beta}</p>
+            <p className="text-sm font-bold text-zinc-900 mt-1">{benchmark.beta}</p>
           </div>
-          <div className="glass rounded-xl p-3 text-center">
+          <div className="bg-white border border-zinc-200 rounded-xl p-3 text-center shadow-sm">
             <p className="text-[10px] text-zinc-500">Best month</p>
-            <p className="text-sm font-bold text-emerald-400 mt-1">+{p.best_month_pct}%</p>
+            <p className="text-sm font-bold text-emerald-500 mt-1">+{p.best_month_pct}%</p>
           </div>
-          <div className="glass rounded-xl p-3 text-center">
+          <div className="bg-white border border-zinc-200 rounded-xl p-3 text-center shadow-sm">
             <p className="text-[10px] text-zinc-500">Worst month</p>
-            <p className="text-sm font-bold text-red-400 mt-1">{p.worst_month_pct}%</p>
+            <p className="text-sm font-bold text-red-500 mt-1">{p.worst_month_pct}%</p>
           </div>
         </div>
       )}

@@ -17,14 +17,14 @@ export function AgentProgress() {
                     {completedSteps.map((step) => (
                         <div
                             key={step.id}
-                            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.02] text-xs"
+                            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-50 border border-zinc-100 text-xs"
                         >
                             {step.ok ? (
                                 <Check className="w-3 h-3 text-emerald-500 flex-shrink-0" />
                             ) : (
                                 <X className="w-3 h-3 text-red-500 flex-shrink-0" />
                             )}
-                            <span className="text-zinc-500 truncate">{step.message}</span>
+                            <span className="text-zinc-600 truncate">{step.message}</span>
                         </div>
                     ))}
                 </div>
@@ -32,14 +32,14 @@ export function AgentProgress() {
 
             {/* Current tool in progress */}
             {toolProgress && (
-                <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-blue-500/5 to-violet-500/5 border border-blue-500/10">
+                <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-blue-50 border border-blue-100">
                     <div className="flex-shrink-0 mt-0.5">
-                        <Loader2 className="w-4 h-4 text-blue-400 animate-spin" />
+                        <Loader2 className="w-4 h-4 text-blue-600 animate-spin" />
                     </div>
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                            <Wrench className="w-3 h-3 text-blue-400" />
-                            <span className="text-xs font-medium text-zinc-200">
+                            <Wrench className="w-3 h-3 text-blue-600" />
+                            <span className="text-xs font-medium text-zinc-900">
                                 {toolProgress.message}
                             </span>
                         </div>
@@ -54,12 +54,12 @@ export function AgentProgress() {
 
             {/* Status text without tool — agent is thinking */}
             {!toolProgress && currentStatusText && (
-                <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-zinc-50 border border-zinc-200 shadow-sm">
                     <div className="relative">
-                        <Brain className="w-4 h-4 text-violet-400" />
-                        <Zap className="w-2 h-2 text-violet-400 absolute -top-0.5 -right-0.5 animate-pulse" />
+                        <Brain className="w-4 h-4 text-blue-600" />
+                        <Zap className="w-2 h-2 text-amber-500 absolute -top-0.5 -right-0.5 animate-pulse" />
                     </div>
-                    <span className="text-xs text-zinc-400 italic">{currentStatusText}</span>
+                    <span className="text-xs text-zinc-600 italic font-medium">{currentStatusText}</span>
                 </div>
             )}
 

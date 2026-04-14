@@ -79,17 +79,17 @@ function EmptyState({
   ];
 
   return (
-    <div className="flex flex-col items-center justify-center h-full text-center px-8">
+    <div className="flex flex-col items-center justify-center h-full text-center px-8 bg-white rounded-3xl shrink mr-4 border border-zinc-200">
       <div className="relative mb-6">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600/20 to-violet-600/20 flex items-center justify-center backdrop-blur-sm border border-white/10">
-          <TrendingUp className="w-8 h-8 text-blue-400" />
+        <div className="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center border border-blue-100">
+          <TrendingUp className="w-8 h-8 text-blue-600" />
         </div>
-        <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-gradient-to-r from-violet-500 to-blue-500 flex items-center justify-center">
+        <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center shadow-sm">
           <Sparkles className="w-3 h-3 text-white" />
         </div>
       </div>
-      <h2 className="text-xl font-semibold text-white mb-2">TradeMind AI</h2>
-      <p className="text-sm text-zinc-400 max-w-sm leading-relaxed">
+      <h2 className="text-xl font-semibold text-zinc-900 mb-2">TradeMind AI</h2>
+      <p className="text-sm text-zinc-500 max-w-sm leading-relaxed">
         Write your investment thesis in natural language and I will convert it into
         a quantified, backtested strategy.
       </p>
@@ -99,7 +99,7 @@ function EmptyState({
             key={example}
             onClick={() => onSelect(example)}
             disabled={disabled}
-            className="w-full text-left text-xs text-zinc-400 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/15 rounded-xl px-4 py-3 transition-all disabled:opacity-50"
+            className="w-full text-left text-xs text-zinc-600 bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 hover:border-zinc-300 rounded-xl px-4 py-3 transition-all disabled:opacity-50"
           >
             &ldquo;{example}&rdquo;
           </button>

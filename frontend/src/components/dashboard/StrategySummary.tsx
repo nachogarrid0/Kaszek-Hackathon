@@ -76,8 +76,8 @@ export function StrategySummary({ data }: StrategySummaryProps) {
   };
 
   return (
-    <div className="glass rounded-2xl p-6 animate-in">
-      <h3 className="text-sm font-semibold text-zinc-300 tracking-wide uppercase mb-5">
+    <div className="bg-white rounded-2xl p-6 animate-in border border-zinc-200 shadow-sm">
+      <h3 className="text-sm font-semibold text-zinc-900 tracking-wide uppercase mb-5">
         Defined Strategy
       </h3>
 
@@ -93,8 +93,8 @@ export function StrategySummary({ data }: StrategySummaryProps) {
               .sort(([, a], [, b]) => b - a)
               .map(([ticker, pct]) => (
                 <div key={ticker} className="flex items-center gap-3">
-                  <span className="text-xs font-bold text-white w-12">{ticker}</span>
-                  <div className="flex-1 h-2 bg-white/[0.04] rounded-full overflow-hidden">
+                  <span className="text-xs font-bold text-zinc-900 w-12">{ticker}</span>
+                  <div className="flex-1 h-2 bg-zinc-100 rounded-full overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all duration-700"
                       style={{
@@ -103,7 +103,7 @@ export function StrategySummary({ data }: StrategySummaryProps) {
                       }}
                     />
                   </div>
-                  <span className="text-xs font-semibold text-zinc-300 w-10 text-right">{pct}%</span>
+                  <span className="text-xs font-semibold text-zinc-600 w-10 text-right">{pct}%</span>
                 </div>
               ))}
           </div>
@@ -113,30 +113,30 @@ export function StrategySummary({ data }: StrategySummaryProps) {
       <div className="grid grid-cols-2 gap-4">
         {/* Entry Rules */}
         {Object.keys(entryRules).length > 0 && (
-          <div className="bg-white/[0.02] rounded-xl p-4 border border-white/[0.04]">
+          <div className="bg-zinc-50 rounded-xl p-4 border border-zinc-200">
             <p className="text-[10px] text-zinc-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <Target className="w-3 h-3 text-emerald-400" />
+              <Target className="w-3 h-3 text-emerald-600" />
               Entry Rules
             </p>
             <div className="space-y-2">
               {entryRules.rsi_oversold != null && (
                 <div className="flex justify-between text-xs">
-                  <span className="text-zinc-500">RSI Oversold</span>
-                  <span className="text-zinc-300 font-medium">&lt; {toStr(entryRules.rsi_oversold)}</span>
+                  <span className="text-zinc-600">RSI Oversold</span>
+                  <span className="text-zinc-900 font-medium">&lt; {toStr(entryRules.rsi_oversold)}</span>
                 </div>
               )}
               {entryRules.require_above_sma200 != null && (
                 <div className="flex justify-between text-xs">
-                  <span className="text-zinc-500">Above SMA200</span>
-                  <span className={`font-medium ${entryRules.require_above_sma200 ? "text-emerald-400" : "text-zinc-500"}`}>
+                  <span className="text-zinc-600">Above SMA200</span>
+                  <span className={`font-medium ${entryRules.require_above_sma200 ? "text-emerald-600" : "text-zinc-500"}`}>
                     {entryRules.require_above_sma200 ? "Required" : "No"}
                   </span>
                 </div>
               )}
               {entryRules.macd_crossover != null && (
                 <div className="flex justify-between text-xs">
-                  <span className="text-zinc-500">MACD Crossover</span>
-                  <span className={`font-medium ${entryRules.macd_crossover ? "text-emerald-400" : "text-zinc-500"}`}>
+                  <span className="text-zinc-600">MACD Crossover</span>
+                  <span className={`font-medium ${entryRules.macd_crossover ? "text-emerald-600" : "text-zinc-500"}`}>
                     {entryRules.macd_crossover ? "Required" : "No"}
                   </span>
                 </div>
@@ -147,34 +147,34 @@ export function StrategySummary({ data }: StrategySummaryProps) {
 
         {/* Exit Rules */}
         {Object.keys(exitRules).length > 0 && (
-          <div className="bg-white/[0.02] rounded-xl p-4 border border-white/[0.04]">
+          <div className="bg-zinc-50 rounded-xl p-4 border border-zinc-200">
             <p className="text-[10px] text-zinc-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <Shield className="w-3 h-3 text-red-400" />
+              <Shield className="w-3 h-3 text-red-600" />
               Exit Rules
             </p>
             <div className="space-y-2">
               {exitRules.stop_loss_pct != null && (
                 <div className="flex justify-between text-xs">
-                  <span className="text-zinc-500">Stop-Loss</span>
-                  <span className="text-red-400 font-medium">{toStr(exitRules.stop_loss_pct)}%</span>
+                  <span className="text-zinc-600">Stop-Loss</span>
+                  <span className="text-red-600 font-medium">{toStr(exitRules.stop_loss_pct)}%</span>
                 </div>
               )}
               {exitRules.take_profit_pct != null && (
                 <div className="flex justify-between text-xs">
-                  <span className="text-zinc-500">Take-Profit</span>
-                  <span className="text-emerald-400 font-medium">{toStr(exitRules.take_profit_pct)}%</span>
+                  <span className="text-zinc-600">Take-Profit</span>
+                  <span className="text-emerald-600 font-medium">{toStr(exitRules.take_profit_pct)}%</span>
                 </div>
               )}
               {exitRules.trailing_stop_pct != null && (
                 <div className="flex justify-between text-xs">
-                  <span className="text-zinc-500">Trailing Stop</span>
-                  <span className="text-amber-400 font-medium">{toStr(exitRules.trailing_stop_pct)}%</span>
+                  <span className="text-zinc-600">Trailing Stop</span>
+                  <span className="text-amber-600 font-medium">{toStr(exitRules.trailing_stop_pct)}%</span>
                 </div>
               )}
               {exitRules.rsi_overbought != null && (
                 <div className="flex justify-between text-xs">
-                  <span className="text-zinc-500">RSI Overbought</span>
-                  <span className="text-zinc-300 font-medium">&gt; {toStr(exitRules.rsi_overbought)}</span>
+                  <span className="text-zinc-600">RSI Overbought</span>
+                  <span className="text-zinc-900 font-medium">&gt; {toStr(exitRules.rsi_overbought)}</span>
                 </div>
               )}
             </div>
@@ -185,7 +185,7 @@ export function StrategySummary({ data }: StrategySummaryProps) {
       {/* Rebalance frequency */}
       <div className="mt-4 flex items-center gap-2 text-xs text-zinc-500">
         <RefreshCw className="w-3 h-3" />
-        <span>Rebalancing: <span className="text-zinc-300 font-medium">{rebalanceLabels[rebalance] || rebalance}</span></span>
+        <span>Rebalancing: <span className="text-zinc-900 font-medium">{rebalanceLabels[rebalance] || rebalance}</span></span>
       </div>
     </div>
   );

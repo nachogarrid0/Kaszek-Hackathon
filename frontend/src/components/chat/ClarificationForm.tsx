@@ -27,10 +27,10 @@ export function ClarificationForm({ onSubmit, disabled }: ClarificationFormProps
     return (
         <div className="animate-in space-y-4 px-2">
             <div className="flex items-center gap-2 mb-2">
-                <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-violet-500/20 to-blue-500/20 flex items-center justify-center">
-                    <Sparkles className="w-3.5 h-3.5 text-violet-400" />
+                <div className="w-6 h-6 rounded-lg bg-blue-50 flex items-center justify-center">
+                    <Sparkles className="w-3.5 h-3.5 text-blue-600" />
                 </div>
-                <p className="text-xs font-medium text-zinc-400">
+                <p className="text-xs font-medium text-zinc-600">
                     Responde estas preguntas para personalizar tu análisis
                 </p>
             </div>
@@ -50,7 +50,7 @@ export function ClarificationForm({ onSubmit, disabled }: ClarificationFormProps
             <button
                 onClick={handleSubmit}
                 disabled={!allRequiredAnswered || disabled || isSubmitting}
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 text-white font-medium hover:from-blue-500 hover:to-violet-500 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20"
+                className="w-full py-3 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-sm"
             >
                 {isSubmitting ? (
                     <>
@@ -80,10 +80,10 @@ function QuestionField({
     disabled?: boolean;
 }) {
     return (
-        <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 transition-all hover:border-white/20">
-            <label className="block text-sm font-medium text-zinc-200 mb-2">
+        <div className="bg-white rounded-xl border border-zinc-200 p-4 transition-all hover:border-zinc-300 shadow-sm">
+            <label className="block text-sm font-medium text-zinc-700 mb-2">
                 {question.question}
-                {question.required && <span className="text-violet-400 ml-1">*</span>}
+                {question.required && <span className="text-red-500 ml-1">*</span>}
             </label>
 
             {question.type === "select" && question.options ? (
@@ -94,8 +94,8 @@ function QuestionField({
                             onClick={() => onChange(opt)}
                             disabled={disabled}
                             className={`text-left text-sm px-4 py-2.5 rounded-lg border transition-all ${value === opt
-                                    ? "bg-gradient-to-r from-blue-600/20 to-violet-600/20 border-blue-500/40 text-white"
-                                    : "bg-white/5 border-white/10 text-zinc-400 hover:border-white/20 hover:text-zinc-300"
+                                ? "bg-blue-50 border-blue-500 text-blue-700 font-medium"
+                                : "bg-zinc-50 border-zinc-200 text-zinc-600 hover:bg-white hover:border-zinc-300"
                                 } disabled:opacity-50`}
                         >
                             {opt}
@@ -109,7 +109,7 @@ function QuestionField({
                     onChange={(e) => onChange(e.target.value)}
                     placeholder={question.placeholder || ""}
                     disabled={disabled}
-                    className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-transparent disabled:opacity-50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-full px-4 py-2.5 rounded-lg bg-zinc-50 border border-zinc-200 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-transparent disabled:opacity-50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
             ) : (
                 <input
@@ -118,7 +118,7 @@ function QuestionField({
                     onChange={(e) => onChange(e.target.value)}
                     placeholder={question.placeholder || ""}
                     disabled={disabled}
-                    className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-transparent disabled:opacity-50"
+                    className="w-full px-4 py-2.5 rounded-lg bg-zinc-50 border border-zinc-200 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-transparent disabled:opacity-50"
                 />
             )}
         </div>

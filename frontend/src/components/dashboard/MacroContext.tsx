@@ -41,16 +41,16 @@ export function MacroContext({ data }: MacroContextProps) {
   ];
 
   return (
-    <div className="glass rounded-2xl p-6 animate-in">
+    <div className="bg-white rounded-2xl p-6 animate-in border border-zinc-200 shadow-sm">
       <div className="flex items-center justify-between mb-5">
-        <h3 className="text-sm font-semibold text-zinc-300 tracking-wide uppercase">
+        <h3 className="text-sm font-semibold text-zinc-900 tracking-wide uppercase">
           Macro Context
         </h3>
         <div className="flex gap-2">
-          <span className="text-[10px] font-medium px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+          <span className="text-[10px] font-medium px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
             {CYCLE_LABELS[data.cycle_phase] || data.cycle_phase}
           </span>
-          <span className={`text-[10px] font-medium px-2.5 py-1 rounded-full border ${ALIGNMENT_COLORS[data.thesis_alignment] || "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"}`}>
+          <span className={`text-[10px] font-medium px-2.5 py-1 rounded-full border ${ALIGNMENT_COLORS[data.thesis_alignment] || "bg-zinc-100 text-zinc-600 border-zinc-200"}`}>
             Alignment: {data.thesis_alignment}
           </span>
         </div>
@@ -59,12 +59,12 @@ export function MacroContext({ data }: MacroContextProps) {
       <div className="grid grid-cols-3 gap-3 mb-4">
         {indicators.map((ind) => {
           const Icon = TREND_ICON[ind.trend] || Minus;
-          const color = TREND_COLOR[ind.trend] || "text-zinc-400";
+          const color = TREND_COLOR[ind.trend] || "text-zinc-600";
           return (
-            <div key={ind.label} className="flex items-center justify-between bg-white/[0.03] rounded-xl px-4 py-3 border border-white/[0.04]">
+            <div key={ind.label} className="flex items-center justify-between bg-zinc-50 rounded-xl px-4 py-3 border border-zinc-100">
               <div>
                 <p className="text-[10px] text-zinc-500 uppercase tracking-wider">{ind.label}</p>
-                <p className="text-lg font-bold text-white mt-0.5">{ind.value}</p>
+                <p className="text-lg font-bold text-zinc-900 mt-0.5">{ind.value}</p>
               </div>
               <Icon className={`w-5 h-5 ${color}`} />
             </div>
@@ -73,7 +73,7 @@ export function MacroContext({ data }: MacroContextProps) {
       </div>
 
       {data.summary && (
-        <p className="text-xs text-zinc-400 leading-relaxed">{data.summary}</p>
+        <p className="text-xs text-zinc-600 leading-relaxed">{data.summary}</p>
       )}
     </div>
   );

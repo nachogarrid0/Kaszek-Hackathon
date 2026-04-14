@@ -39,7 +39,7 @@ export function ChatInput({ onSend, disabled, placeholder }: ChatInputProps) {
   };
 
   return (
-    <div className="border-t border-white/[0.06] p-4 bg-[var(--bg-surface)]">
+    <div className="border-t border-zinc-200 p-4 bg-white">
       <div className="flex items-end gap-2">
         <textarea
           ref={textareaRef}
@@ -50,12 +50,12 @@ export function ChatInput({ onSend, disabled, placeholder }: ChatInputProps) {
           placeholder={placeholder || "Write your investment thesis..."}
           disabled={disabled}
           rows={1}
-          className="flex-1 resize-none rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          className="flex-1 resize-none rounded-xl bg-zinc-50 border border-zinc-200 px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         />
         <button
           onClick={handleSend}
           disabled={disabled || !value.trim()}
-          className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 text-white flex items-center justify-center hover:from-blue-500 hover:to-violet-500 transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-lg shadow-blue-500/20"
+          className="flex-shrink-0 w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-blue-500/20"
         >
           <Send className="w-4 h-4" />
         </button>

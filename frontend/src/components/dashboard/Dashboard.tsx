@@ -9,7 +9,7 @@ import { MetricsCards } from "./MetricsCards";
 import { EquityCurve } from "./EquityCurve";
 import { ApproveButton } from "./ApproveButton";
 import { StrategySummary } from "./StrategySummary";
-import { BarChart3, Sparkles } from "lucide-react";
+import { Activity, Sparkles } from "lucide-react";
 
 export function Dashboard() {
   const {
@@ -32,12 +32,12 @@ export function Dashboard() {
 
   if (!hasContent) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-center">
+      <div className="flex flex-col items-center justify-center h-full text-center min-h-[400px]">
         <div className="relative mb-6">
-          <div className="w-20 h-20 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center">
-            <BarChart3 className="w-10 h-10 text-zinc-700" />
+          <div className="w-16 h-16 rounded-2xl bg-zinc-100 flex items-center justify-center border border-zinc-200">
+            <Activity className="w-8 h-8 text-zinc-400" />
           </div>
-          <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-gradient-to-r from-blue-600 to-violet-600 flex items-center justify-center animate-glow">
+          <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center shadow-sm">
             <Sparkles className="w-3 h-3 text-white" />
           </div>
         </div>
@@ -48,7 +48,7 @@ export function Dashboard() {
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="w-1.5 h-1.5 rounded-full bg-zinc-700 animate-pulse"
+              className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"
               style={{ animationDelay: `${i * 200}ms` }}
             />
           ))}

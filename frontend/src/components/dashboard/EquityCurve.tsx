@@ -21,8 +21,8 @@ export function EquityCurve({ data }: EquityCurveProps) {
   const tickInterval = Math.floor(data.length / 6);
 
   return (
-    <div className="glass rounded-2xl p-6 animate-in">
-      <h3 className="text-sm font-semibold text-zinc-300 tracking-wide uppercase mb-5">
+    <div className="bg-white rounded-2xl p-6 animate-in border border-zinc-200 shadow-sm">
+      <h3 className="text-sm font-semibold text-zinc-900 tracking-wide uppercase mb-5">
         Curva de Equity
       </h3>
       <div className="h-64">
@@ -34,29 +34,30 @@ export function EquityCurve({ data }: EquityCurveProps) {
                 <stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#f4f4f5" />
             <XAxis
               dataKey="date"
-              tick={{ fontSize: 10, fill: "#52525b" }}
+              tick={{ fontSize: 10, fill: "#71717a" }}
               interval={tickInterval}
               tickFormatter={(d: string) => d.slice(5)}
-              axisLine={{ stroke: "rgba(255,255,255,0.04)" }}
-              tickLine={{ stroke: "rgba(255,255,255,0.04)" }}
+              axisLine={{ stroke: "#e4e4e7" }}
+              tickLine={{ stroke: "#e4e4e7" }}
             />
             <YAxis
-              tick={{ fontSize: 10, fill: "#52525b" }}
+              tick={{ fontSize: 10, fill: "#71717a" }}
               tickFormatter={(v: number) => `$${(v / 1000).toFixed(1)}k`}
-              axisLine={{ stroke: "rgba(255,255,255,0.04)" }}
-              tickLine={{ stroke: "rgba(255,255,255,0.04)" }}
+              axisLine={{ stroke: "#e4e4e7" }}
+              tickLine={{ stroke: "#e4e4e7" }}
             />
             <Tooltip
               contentStyle={{
                 fontSize: 12,
                 borderRadius: 12,
-                border: "1px solid rgba(255,255,255,0.1)",
-                background: "rgba(18,18,26,0.95)",
-                color: "#f4f4f5",
+                border: "1px solid #e4e4e7",
+                background: "rgba(255,255,255,0.95)",
+                color: "#18181b",
                 backdropFilter: "blur(12px)",
+                boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)"
               }}
               formatter={(value, name) => [
                 `$${Number(value).toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
@@ -88,11 +89,11 @@ export function EquityCurve({ data }: EquityCurveProps) {
         <div className="flex items-center gap-6 mt-4 justify-center">
           <div className="flex items-center gap-2">
             <div className="w-5 h-0.5 rounded bg-blue-500" />
-            <span className="text-xs text-zinc-400">Tu Estrategia</span>
+            <span className="text-xs text-zinc-600">Tu Estrategia</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-5 h-0.5 rounded bg-zinc-600" style={{ borderTop: "1.5px dashed #52525b" }} />
-            <span className="text-xs text-zinc-400">S&P 500</span>
+            <div className="w-5 h-0.5 rounded bg-zinc-400" style={{ borderTop: "1.5px dashed #a1a1aa" }} />
+            <span className="text-xs text-zinc-600">S&P 500</span>
           </div>
         </div>
       )}
