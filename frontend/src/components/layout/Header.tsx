@@ -30,6 +30,13 @@ export function Header() {
         >
           Mis Estrategias
         </Link>
+        <Link
+          href="/live/demo?scenario=rotation"
+          className="flex items-center gap-1.5 text-sm text-zinc-600 hover:text-zinc-900 transition-colors"
+        >
+          <span className="w-2 h-2 rounded-full bg-green-400 inline-block" />
+          Live Trading
+        </Link>
       </nav>
     </header>
   );
